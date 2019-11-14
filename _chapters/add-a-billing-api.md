@@ -15,23 +15,24 @@ Now let's get started with creating our billing API. It is going to take a Strip
 <img class="code-marker" src="/assets/s.png" />Start by installing the Stripe NPM package. Run the following in the root of our project.
 
 ``` bash
-$ npm install --save stripe
+$ npm install --save stripe @types/stripe
 ```
 
-<img class="code-marker" src="/assets/s.png" />Next, add the following to `billing.js`.
+<img class="code-marker" src="/assets/s.png" />Next, add the following to `billing.ts`.
 
 ``` js
-import stripePackage from "stripe";
+import * as stripePackage from "stripe";
 import { calculateCost } from "./libs/billing-lib";
 import { success, failure } from "./libs/response-lib";
+import { APIGatewayProxyHandler } from 'aws-lambda'
 
-export async function main(event, context) {
-  const { storage, source } = JSON.parse(event.body);
+export const main: APIGatewayProxyHandler = async (event, context) => {
+  const { storage, source }: { storage: number, source: string } = JSON.parse(event.body);
   const amount = calculateCost(storage);
   const description = "Scratch charge";
 
   // Load our secret key from the  environment variables
-  const stripe = stripePackage(process.env.stripeSecretKey);
+  const stripe = new stripePackage(process.env.stripeSecretKey);
 
   try {
     await stripe.charges.create({
@@ -61,10 +62,10 @@ Most of this is fairly straightforward but let's go over it quickly:
 
 Now let's implement our `calculateCost` method. This is primarily our *business logic*.
 
-<img class="code-marker" src="/assets/s.png" />Create a `libs/billing-lib.js` and add the following.
+<img class="code-marker" src="/assets/s.png" />Create a `libs/billing-lib.ts` and add the following.
 
 ``` js
-export function calculateCost(storage) {
+export const calculateCost: (storage: number) => number = (storage) => {
   const rate = storage <= 10
     ? 4
     : storage <= 100
@@ -85,7 +86,7 @@ Let's add a reference to our new API and Lambda function.
 
 ``` yml
   billing:
-    # Defines an HTTP API endpoint that calls the main function in billing.js
+    # Defines an HTTP API endpoint that calls the main function in billing.ts
     # - path: url path is /billing
     # - method: POST request
     handler: billing.main

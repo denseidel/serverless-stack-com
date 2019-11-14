@@ -12,13 +12,14 @@ Finally, we are going to create an API that allows a user to delete a given note
 
 ### Add the Function
 
-<img class="code-marker" src="/assets/s.png" />Create a new file `delete.js` and paste the following code
+<img class="code-marker" src="/assets/s.png" />Create a new file `delete.ts` and paste the following code
 
 ``` javascript
 import * as dynamoDbLib from "./libs/dynamodb-lib";
 import { success, failure } from "./libs/response-lib";
+import { APIGatewayProxyHandler } from 'aws-lambda'
 
-export async function main(event, context) {
+export const main: APIGatewayProxyHandler = async (event, context) => {
   const params = {
     TableName: process.env.tableName,
     // 'Key' defines the partition key and sort key of the item to be removed
@@ -38,6 +39,20 @@ export async function main(event, context) {
   }
 }
 ```
+
+Update `./libs/dynamodb-lib`: 
+
+``` javascript
+import * as AWS from "aws-sdk";
+
+export function call(action: string, params: AWS.DynamoDB.DocumentClient.PutItemInput | AWS.DynamoDB.DocumentClient.GetItemInput | AWS.DynamoDB.DocumentClient.QueryInput | AWS.DynamoDB.DocumentClient.UpdateItemInput | AWS.DynamoDB.DocumentClient.DeleteItemInput) {
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
+  return dynamoDb[action](params).promise();
+}
+```
+
+
 
 This makes a DynamoDB `delete` call with the `userId` & `noteId` key to delete the note.
 

@@ -26,8 +26,14 @@ The above command needs [NPM](https://www.npmjs.com), a package manager for Java
 
 <img class="code-marker" src="/assets/s.png" />In your working directory; create a project using a Node.js starter. We'll go over some of the details of this starter project in the next chapter.
 
-``` bash
+TODO: Update to create own serverless-starter based on typescript, and update serverless-bundle. For the time being not the extra steps doing it with the typescript template provided by serverless framework.
+
+<!-- ``` bash
 $ serverless install --url https://github.com/AnomalyInnovations/serverless-nodejs-starter --name notes-app-api
+``` -->
+
+``` bash
+$ mkdir notes-app-api && cd notes-app-api && serverless create --template aws-nodejs-typescript
 ```
 
 <img class="code-marker" src="/assets/s.png" />Go into the directory for our backend api project.
@@ -36,12 +42,20 @@ $ serverless install --url https://github.com/AnomalyInnovations/serverless-node
 $ cd notes-app-api
 ```
 
-Now the directory should contain a few files including, the **handler.js** and **serverless.yml**.
+Now the directory should contain a few files including, the **handler.ts** and **serverless.yml**.
 
-- **handler.js** file contains actual code for the services/functions that will be deployed to AWS Lambda.
+- **handler.ts** file contains actual code for the services/functions that will be deployed to AWS Lambda.
 - **serverless.yml** file contains the configuration on what AWS services Serverless will provision and how to configure them.
 
 We also have a `tests/` directory where we can add our unit tests.
+
+Currently `__tests__/` need to be created for Typescript manually and [setup](https://serverless.com/blog/unit-testing-nodejs-serverless-jest/) unit testing with Jest for serverless.
+
+``` bash
+$ mkdir __tests__/
+$ npm install --save-dev jest @types/jest ts-jest
+```
+
 
 ### Install Node.js packages
 

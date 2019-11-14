@@ -84,5 +84,6 @@ Finally, select **Domain name** from the left panel. Enter your unique domain na
 
 ![Select Congito User Pool Apps Screenshot](/assets/cognito-user-pool/user-pool-domain-name.png)
 
-
 Now our Cognito User Pool is ready. It will maintain a user directory for our notes app. It will also be used to authenticate access to our API. Next let's set up a test user within the pool.
+
+TODO: Add a link to the infrastructure automation with Terraform/CF.

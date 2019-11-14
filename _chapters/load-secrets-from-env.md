@@ -29,6 +29,20 @@ Make sure to replace the `STRIPE_TEST_SECRET_KEY` with the **Secret key** from t
 
 We are using the [serverless-dotenv-plugin](https://github.com/colynb/serverless-dotenv-plugin) to load these as an environment variable when our Lambda function runs locally. This allows us to reference them in our `serverless.yml`. We will not be commiting the `.env` file to Git as we are only going to use these locally. When we look at automating deployments, we'll be adding our secrets to the CI, so they'll be made available through there instead.
 
+<img class="code-marker" src="/assets/s.png" /> Install `serverless-dotenv-plugin`:
+
+``` bash
+$ npm install --save-dev serverless-dotenv-plugin
+```
+
+Add it to `serverless.yml` under `plugins`:
+
+``` yaml
+plugins:
+  - serverless-dotenv-plugin # Load .env as environment variables
+```
+
+
 Next, let's add a reference to these.
 
 <img class="code-marker" src="/assets/s.png" />And add the following in the `environment:` block in your `serverless.yml`.

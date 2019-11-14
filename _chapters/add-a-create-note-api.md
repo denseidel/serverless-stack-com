@@ -18,59 +18,59 @@ Let's add our first function.
 
 ``` javascript
 import uuid from "uuid";
-import AWS from "aws-sdk";
+import * as AWS from "aws-sdk";
+import { APIGatewayProxyHandler } from 'aws-lambda';
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-export function main(event, context, callback) {
-  // Request body is passed in as a JSON encoded string in 'event.body'
-  const data = JSON.parse(event.body);
-
-  const params = {
-    TableName: process.env.tableName,
-    // 'Item' contains the attributes of the item to be created
-    // - 'userId': user identities are federated through the
-    //             Cognito Identity Pool, we will use the identity id
-    //             as the user id of the authenticated user
-    // - 'noteId': a unique uuid
-    // - 'content': parsed from request body
-    // - 'attachment': parsed from request body
-    // - 'createdAt': current Unix timestamp
-    Item: {
-      userId: event.requestContext.identity.cognitoIdentityId,
-      noteId: uuid.v1(),
-      content: data.content,
-      attachment: data.attachment,
-      createdAt: Date.now()
+export const main: APIGatewayProxyHandler = async (event, _context) => {
+  try {
+    // Request body is passed in as a JSON encoded string in 'event.body'
+    const data = JSON.parse(event.body)
+    const params = {
+      TableName: process.env.tableName,
+      // 'Item' contains the attributes of the item to be created
+      // - 'userId': user identities are federated through the
+      //             Cognito Identity Pool, we will use the identity id
+      //             as the user id of the authenticated user
+      // - 'noteId': a unique uuid
+      // - 'content': parsed from request body
+      // - 'attachment': parsed from request body
+      // - 'createdAt': current Unix timestamp
+      Item: {
+        userId: event.requestContext.identity.cognitoIdentityId,
+        noteId: uuid.v1(),
+        content: data.content,
+        attachment: data.attachment,
+        createdAt: Date.now()
+      }
     }
-  };
-
-  dynamoDb.put(params, (error, data) => {
+    await dynamoDb.put(params).promise()
     // Set response headers to enable CORS (Cross-Origin Resource Sharing)
     const headers = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Credentials": true
-    };
-
-    // Return status code 500 on error
-    if (error) {
-      const response = {
-        statusCode: 500,
-        headers: headers,
-        body: JSON.stringify({ status: false })
-      };
-      callback(null, response);
-      return;
     }
-
     // Return status code 200 and the newly created item
-    const response = {
+    return {
       statusCode: 200,
       headers: headers,
       body: JSON.stringify(params.Item)
-    };
-    callback(null, response);
-  });
+    }
+  } catch (e) {
+    // Set response headers to enable CORS (Cross-Origin Resource Sharing)
+    const headers = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true
+    }
+    // Return status code 500 on error
+    return {
+      statusCode: 500,
+      headers: headers,
+      body: JSON.stringify({ status: false })
+    }
+
+  }
 }
 ```
 
@@ -91,28 +91,31 @@ Now let's define the API endpoint for our function.
 <img class="code-marker" src="/assets/s.png" />Open the `serverless.yml` file and replace it with the following.
 
 ``` yaml
-service: notes-app-api
+service:
+  name: notes-app-api
 
-# Create an optimized package for our functions
 package:
   individually: true
 
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+
+# Add the serverless-webpack plugin
 plugins:
-  - serverless-bundle # Package our functions with Webpack
-  - serverless-offline
-  - serverless-dotenv-plugin # Load .env as environment variables
+  - serverless-webpack
 
 provider:
   name: aws
   runtime: nodejs10.x
   stage: prod
   region: us-east-1
-
   # These environment variables are made available to our functions
   # under process.env.
   environment:
     tableName: notes
-
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
   # 'iamRoleStatements' defines the permission policy for the Lambda function.
   # In this case Lambda functions are granted with permissions to access DynamoDB.
   iamRoleStatements:
@@ -126,9 +129,11 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:us-east-1:*:*"
+  apiGateway:
+    minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
 
 functions:
-  # Defines an HTTP API endpoint that calls the main function in create.js
+  # Defines an HTTP API endpoint that calls the main function in create.ts
   # - path: url path is /notes
   # - method: POST request
   # - cors: enabled CORS (Cross-Origin Resource Sharing) for browser cross
@@ -218,15 +223,17 @@ $ cd libs
 <img class="code-marker" src="/assets/s.png" />And create a `libs/response-lib.js` file.
 
 ``` javascript
-export function success(body) {
+import { APIGatewayProxyResult } from 'aws-lambda'
+
+export function success(body: any): APIGatewayProxyResult {
   return buildResponse(200, body);
 }
 
-export function failure(body) {
+export function failure(body: any): APIGatewayProxyResult {
   return buildResponse(500, body);
 }
 
-function buildResponse(statusCode, body) {
+function buildResponse(statusCode: number, body: any): APIGatewayProxyResult {
   return {
     statusCode: statusCode,
     headers: {
@@ -260,25 +267,26 @@ Here we are using the promise form of the DynamoDB methods. Promises are a metho
 import uuid from "uuid";
 import * as dynamoDbLib from "./libs/dynamodb-lib";
 import { success, failure } from "./libs/response-lib";
+import { APIGatewayProxyHandler } from 'aws-lambda';
 
-export async function main(event, context) {
-  const data = JSON.parse(event.body);
-  const params = {
-    TableName: process.env.tableName,
-    Item: {
-      userId: event.requestContext.identity.cognitoIdentityId,
-      noteId: uuid.v1(),
-      content: data.content,
-      attachment: data.attachment,
-      createdAt: Date.now()
-    }
-  };
-
+export const main: APIGatewayProxyHandler = async (event, _context) => {
   try {
-    await dynamoDbLib.call("put", params);
-    return success(params.Item);
+    const data = JSON.parse(event.body)
+    const params = {
+      TableName: process.env.tableName,
+      Item: {
+        userId: event.requestContext.identity.cognitoIdentityId,
+        noteId: uuid.v1(),
+        content: data.content,
+        attachment: data.attachment,
+        createdAt: Date.now()
+      }
+    }
+    await dynamoDbLib.call("put", params)
+    return success(params.Item)
   } catch (e) {
-    return failure({ status: false });
+    return failure({ status: false })
+
   }
 }
 ```

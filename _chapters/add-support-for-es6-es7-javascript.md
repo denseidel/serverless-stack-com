@@ -9,6 +9,8 @@ description: AWS Lambda supports Node.js v8.10 and so to use ES import/exports i
 comments_id: add-support-for-es6-es7-javascript/128
 ---
 
+TODO: Migrate this section to my own typescript starter after it is created.
+
 AWS Lambda recently added support for Node.js v8.10 and v10.x. The supported syntax is a little different when compared to the frontend React app we'll be working on a little later. It makes sense to use similar ES features across both parts of the project – specifically, we'll be relying on ES imports/exports in our handler functions. To do this we will be transpiling our code using [Babel](https://babeljs.io) and [Webpack 4](https://webpack.github.io). Also, Webpack allows us to generate optimized packages for our Lambda functions by only including the code that is used in our function. This helps keep our packages small and reduces cold start times. Serverless Framework supports plugins to do this automatically. We are going to use an extension of the popular [serverless-webpack](https://github.com/serverless-heaven/serverless-webpack) plugin, [serverless-bundle](https://github.com/AnomalyInnovations/serverless-bundle).
 
 All this has been added in the previous chapter using the [`serverless-nodejs-starter`]({% link _chapters/serverless-nodejs-starter.md %}). We created this starter for a couple of reasons:

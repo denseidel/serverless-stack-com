@@ -12,13 +12,14 @@ Now let's create an API that allows a user to update a note with a new note obje
 
 ### Add the Function
 
-<img class="code-marker" src="/assets/s.png" />Create a new file `update.js` and paste the following code
+<img class="code-marker" src="/assets/s.png" />Create a new file `update.ts` and paste the following code
 
 ``` javascript
 import * as dynamoDbLib from "./libs/dynamodb-lib";
 import { success, failure } from "./libs/response-lib";
+import { APIGatewayProxyHandler } from 'aws-lambda'
 
-export async function main(event, context) {
+export const main: APIGatewayProxyHandler = async (event, context) => {
   const data = JSON.parse(event.body);
   const params = {
     TableName: process.env.tableName,
@@ -51,7 +52,20 @@ export async function main(event, context) {
 }
 ```
 
-This should look similar to the `create.js` function. Here we make an `update` DynamoDB call with the new `content` and `attachment` values in the `params`.
+Update `./libs/dynamodb-lib`:
+
+``` javascript
+import * as AWS from "aws-sdk";
+
+export function call(action: string, params: AWS.DynamoDB.DocumentClient.PutItemInput | AWS.DynamoDB.DocumentClient.GetItemInput | AWS.DynamoDB.DocumentClient.QueryInput | AWS.DynamoDB.DocumentClient.UpdateItemInput) {
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
+  return dynamoDb[action](params).promise();
+}
+```
+
+
+This should look similar to the `create.ts` function. Here we make an `update` DynamoDB call with the new `content` and `attachment` values in the `params`.
 
 ### Configure the API Endpoint
 

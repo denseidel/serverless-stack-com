@@ -15,12 +15,12 @@ We are going to use [Jest](https://facebook.github.io/jest/) for this and it is 
 However, if you are starting a new Serverless Framework project. Add Jest to your dev dependencies by running the following.
 
 ``` bash
-$ npm install --save-dev jest
+$ npm install --save-dev jest @types/jest ts-jest
 ```
 
 And update the `scripts` block in your `package.json` with the following:
 
-```
+``` json
 "scripts": {
   "test": "jest"
 },
@@ -28,9 +28,17 @@ And update the `scripts` block in your `package.json` with the following:
 
 This will allow you to run your tests using the command `npm test`.
 
+Then add a jest [config](https://kulshekhar.github.io/ts-jest/user/config/) file setting up `ts-jest` under `./jest.config.js`:
+
+``` javascript
+module.exports = {
+  preset: 'ts-jest'
+}
+```
+
 Alternatively, if you are using the [serverless-bundle](https://github.com/AnomalyInnovations/serverless-bundle) plugin to package your functions, it comes with a built-in script to transpile your code and run your tests. Add the following to your `package.json` instead.
 
-```
+``` json
 "scripts": {
   "test": "serverless-bundle test"
 },
@@ -38,7 +46,7 @@ Alternatively, if you are using the [serverless-bundle](https://github.com/Anoma
 
 ### Add Unit Tests
 
-<img class="code-marker" src="/assets/s.png" />Now create a new file in `tests/billing.test.js` and add the following.
+<img class="code-marker" src="/assets/s.png" />Now create a new file in `tests/billing.test.ts` and add the following.
 
 ``` js
 import { calculateCost } from "../libs/billing-lib";

@@ -12,13 +12,14 @@ Now we are going to add an API that returns a list of all the notes a user has.
 
 ### Add the Function
 
-<img class="code-marker" src="/assets/s.png" />Create a new file called `list.js` with the following.
+<img class="code-marker" src="/assets/s.png" />Create a new file called `list.ts` with the following.
 
 ``` javascript
 import * as dynamoDbLib from "./libs/dynamodb-lib";
 import { success, failure } from "./libs/response-lib";
+import { APIGatewayProxyHandler } from 'aws-lambda';
 
-export async function main(event, context) {
+export const main: APIGatewayProxyHandler = async (event, context) => {
   const params = {
     TableName: process.env.tableName,
     // 'KeyConditionExpression' defines the condition for the query
@@ -43,7 +44,19 @@ export async function main(event, context) {
 }
 ```
 
-This is pretty much the same as our `get.js` except we only pass in the `userId` in the DynamoDB `query` call.
+Again update the `./libs/dynamodb-lib` with the Input Type:
+
+``` javascript
+import * as AWS from "aws-sdk";
+
+export function call(action: string, params: AWS.DynamoDB.DocumentClient.PutItemInput | AWS.DynamoDB.DocumentClient.GetItemInput | AWS.DynamoDB.DocumentClient.QueryInput) {
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
+  return dynamoDb[action](params).promise();
+}
+```
+
+This is pretty much the same as our `get.ts` except we only pass in the `userId` in the DynamoDB `query` call.
 
 ### Configure the API Endpoint
 
@@ -51,7 +64,7 @@ This is pretty much the same as our `get.js` except we only pass in the `userId`
 
 ``` yaml
   list:
-    # Defines an HTTP API endpoint that calls the main function in list.js
+    # Defines an HTTP API endpoint that calls the main function in list.ts
     # - path: url path is /notes
     # - method: GET request
     handler: list.main
@@ -98,6 +111,6 @@ The response should look similar to this.
 }
 ```
 
-Note that this API returns an array of note objects as opposed to the `get.js` function that returns just a single note object.
+Note that this API returns an array of note objects as opposed to the `get.ts` function that returns just a single note object.
 
 Next we are going to add an API to update a note.

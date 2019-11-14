@@ -46,6 +46,12 @@ Finally here is what a Lambda function (a Node.js version) looks like.
 
 Here `myHandler` is the name of our Lambda function. The `event` object contains all the information about the event that triggered this Lambda. In the case of an HTTP request it'll be information about the specific HTTP request. The `context` object contains info about the runtime our Lambda function is executing in. After we do all the work inside our Lambda function, we simply call the `callback` function with the results (or the error) and AWS will respond to the HTTP request with it. 
 
+Typescript adds types and also migrates from callback to using async and simply returning: 
+
+![Anatomy of a Typescript Lambda Functionn image](/assets/anatomy-of-a-typescript-lambda-function.png)
+
+Here we import different types that we then add to the input object as well as the output and error objects. Futher we replace the callback function with `async/await`.
+
 ### Packaging Functions
 
 Lambda functions need to be packaged and sent to AWS. This is usually a process of compressing the function and all its dependencies and uploading it to a S3 bucket. And letting AWS know that you want to use this package when a specific event takes place. To help us with this process we use the [Serverless Framework](https://serverless.com). We'll go over this in detail later on in this guide.
@@ -61,6 +67,8 @@ This has some interesting implications. Firstly, our functions are effectively s
 The above execution model makes Lambda functions effectively stateless. This means that every time your Lambda function is triggered by an event it is invoked in a completely new environment. You don't have access to the execution context of the previous event.
 
 However, due to the optimization noted above, the actual Lambda function is invoked only once per container instantiation. Recall that our functions are run inside containers. So when a function is first invoked, all the code in our handler function gets executed and the handler function gets invoked. If the container is still available for subsequent requests, your function will get invoked and not the code around it.
+
+TODO: Update code to typescript including an interface for the dbConnection.
 
 For example, the `createNewDbConnection` method below is called once per container instantiation and not every time the Lambda function is invoked. The `myHandler` function on the other hand is called on every invocation.
 

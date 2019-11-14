@@ -12,13 +12,14 @@ Now that we created a note and saved it to our database. Let's add an API to ret
 
 ### Add the Function
 
-<img class="code-marker" src="/assets/s.png" />Create a new file `get.js` and paste the following code
+<img class="code-marker" src="/assets/s.png" />Create a new file `get.ts` and paste the following code
 
 ``` javascript
 import * as dynamoDbLib from "./libs/dynamodb-lib";
 import { success, failure } from "./libs/response-lib";
+import { APIGatewayProxyHandler } from 'aws-lambda';
 
-export async function main(event, context) {
+export const main: APIGatewayProxyHandler = async (event, context) => {
   const params = {
     TableName: process.env.tableName,
     // 'Key' defines the partition key and sort key of the item to be retrieved
@@ -44,7 +45,17 @@ export async function main(event, context) {
 }
 ```
 
-This follows exactly the same structure as our previous `create.js` function. The major difference here is that we are doing a `dynamoDbLib.call('get', params)` to get a note object given the `noteId` and `userId` that is passed in through the request.
+Further add the input type `GetItemInput` to the `./libs/dynamodb-lib`: 
+
+``` javascript
+export function call(action: string, params: AWS.DynamoDB.DocumentClient.PutItemInput | AWS.DynamoDB.DocumentClient.GetItemInput) {
+  const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
+  return dynamoDb[action](params).promise();
+}
+```
+
+This follows exactly the same structure as our previous `create.ts` function. The major difference here is that we are doing a `dynamoDbLib.call('get', params)` to get a note object given the `noteId` and `userId` that is passed in through the request.
 
 ### Configure the API Endpoint
 
@@ -70,7 +81,7 @@ This defines our get note API. It adds a GET request handler with the endpoint `
 
 ### Test
 
-To test our get note API we need to mock passing in the `noteId` parameter. We are going to use the `noteId` of the note we created in the previous chapter and add in a `pathParameters` block to our mock. So it should look similar to the one below. Replace the value of `id` with the id you received when you invoked the previous `create.js` function.
+To test our get note API we need to mock passing in the `noteId` parameter. We are going to use the `noteId` of the note we created in the previous chapter and add in a `pathParameters` block to our mock. So it should look similar to the one below. Replace the value of `id` with the id you received when you invoked the previous `create.ts` function.
 
 <img class="code-marker" src="/assets/s.png" />Create a `mocks/get-event.json` file and add the following.
 

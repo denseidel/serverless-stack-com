@@ -14,6 +14,8 @@ To step through the major concepts involved in building web applications, we are
 
 <img alt="Completed app mobile screenshot" src="/assets/completed-app-mobile.png" width="432" />
 
+TODO: Add link to the complete backend and frontend code sample (typecript) after creating it.
+
 It is a single page application powered by a serverless API written completely in JavaScript. Here is the complete source for the [backend]({{ site.backend_github_repo }}) and the [frontend]({{ site.frontend_github_repo }}). It is a relatively simple application but we are going to address the following requirements.
 
 - Should allow users to signup and login to their accounts
@@ -31,6 +33,8 @@ We'll be using the AWS Platform to build it. We might expand further and cover a
 ### Technologies & Services
 
 We'll be using the following set of technologies and services to build our serverless application. 
+
+TODO: Update the technology list for CI/CD when replacing SEED, DynamoDB (?)
 
 - [Lambda][Lambda] & [API Gateway][APIG] for our serverless API
 - [DynamoDB][DynamoDB] for our database
@@ -55,6 +59,8 @@ While the list above might look daunting, we are trying to ensure that upon comp
 
 You just need a couple of things to work through this guide:
 
+TODO: Add Typescript, Jest or later?
+
 - [Node v8.10+ and NPM v5.5+](https://nodejs.org/en/) installed on your machine.
 - A free [GitHub account](https://github.com/join).
 - And basic knowledge of how to use the command line. 
@@ -70,6 +76,8 @@ The guide is split roughly into a couple of parts:
    This section of the guide is carefully designed to be completed in its entirety. We go into all the steps in detail and have tons of screenshots to help you build your first app.
 
 2. **The Best Practices**
+
+TODO: Add migration to Azure and GCP as a section.
 
    We launched this guide in early 2017 with just the first part. The Serverless Stack community has grown and many of our readers have used the setup described in this guide to build apps that power their businesses. In this section, we cover the best practices of running production applications. These really begin to matter once your application codebase grows or when you add more folks to your team.
 
@@ -97,6 +105,8 @@ For the backend:
 
 For the frontend:
 
+TODO: Replace bootstrap with antdesign
+
 - Set up our project with Create React App
 - Add favicons, fonts, and a UI Kit using Bootstrap
 - Set up routes using React-Router
@@ -109,6 +119,9 @@ For the frontend:
 - Configure custom domains through Netlify
 
 Automate backend deployments:
+
+TODO: Replace Seed with Azure CI/CD
+
 - Configure DynamoDB through code
 - Configure S3 through code
 - Configure Cognito User Pool through code
@@ -119,7 +132,6 @@ Automate backend deployments:
 - Automating deployments using Seed
 - Configuring custom domains through Seed
 - Monitoring deployments through Seed
-
 
 We think this will give you a good foundation on building full-stack production ready serverless applications. If there are any other concepts or technologies you'd like us to cover, feel free to let us know on our [forums]({{ site.forum_url }}).
 
