@@ -15,7 +15,7 @@ To complete the login process we would need to update the app state with the ses
 
 First we'll start by updating the application state by setting that the user is logged in. We might be tempted to store this in the `Login` container, but since we are going to use this in a lot of other places, it makes sense to lift up the state. The most logical place to do this will be in our `App` component.
 
-To save the user's login state, let's include the `useState` hook in `src/App.js`.
+To save the user's login state, let's include the `useState` hook in `src/App.tsx`.
 
 <img class="code-marker" src="/assets/s.png" />Replace, the `React` import:
 
@@ -37,11 +37,22 @@ const [isAuthenticated, userHasAuthenticated] = useState(false);
 
 This initializes the `isAuthenticated` state variable to `false`, as in the user is not logged in. And calling `userHasAuthenticated` updates it. But for the `Login` container to call this method we need to pass a reference of this method to it.
 
+Further add an interface defining the props and update the imports from `react`:
+
+``` javascript
+import React, { useState, Dispatch, SetStateAction } from "react";
+
+export interface AppProps {
+  isAuthenticated: boolean;
+  userHasAuthenticated: Dispatch<SetStateAction<boolean>>;
+}
+```
+
 ### Pass the Session State to the Routes
 
 We can do this by passing in a couple of props to the child component of the routes that the `App` component creates.
 
-<img class="code-marker" src="/assets/s.png" />Replace our `Routes` component by replacing the following line in the `return` statement of `src/App.js`.
+<img class="code-marker" src="/assets/s.png" />Replace our `Routes` component by replacing the following line in the `return` statement of `src/App.tsx`.
 
 ``` coffee
 <Routes />
@@ -67,17 +78,28 @@ $ mkdir src/components/
 
 Here we'll be storing all our React components that are not dealing directly with our API or responding to routes.
 
-<img class="code-marker" src="/assets/s.png" />Create a new component in `src/components/AppliedRoute.js` and add the following.
+<img class="code-marker" src="/assets/s.png" />Create a new component in `src/components/AppliedRoute.tsx` and add the following.
 
 ``` coffee
 import React from "react";
-import { Route } from "react-router-dom";
+import { Route, RouteProps } from "react-router-dom";
+import { AppProps } from "../App";
 
-export default function AppliedRoute({ component: C, appProps, ...rest }) {
-  return (
-    <Route {...rest} render={props => <C {...props} {...appProps} />} />
-  );
+interface AppliedRoutePops extends RouteProps {
+  component: any;
+  appProps: AppProps;
+  path: string;
 }
+
+const AppliedRoute = ({
+  component: C,
+  appProps,
+  ...rest
+}: AppliedRoutePops): JSX.Element => {
+  return <Route {...rest} render={props => <C {...props} {...appProps} />} />;
+};
+
+export default AppliedRoute;
 ```
 
 This simple component creates a `Route` where the child component that it renders contains the passed in props. Let's take a quick look at how this being done.
@@ -92,22 +114,35 @@ This simple component creates a `Route` where the child component that it render
 
 Now to use this component, we are going to include it in the routes where we need to have the `appProps` passed in.
 
-<img class="code-marker" src="/assets/s.png" />Replace the `Routes` function in `src/Routes.js` with the following.
+<img class="code-marker" src="/assets/s.png" />Replace the `Routes` function in `src/Routes.tsx` with the following.
 
 ``` coffee
-export default function Routes({ appProps }) {
+import React from "react";
+import { Route, Switch } from "react-router-dom";
+import Home from "./containers/Home";
+import NotFound from "./containers/NotFound";
+import Login from "./containers/Login";
+import { AppProps } from "./App";
+import AppliedRoute from "./components/AppliedRoute";
+
+interface RoutesProps {
+  appProps: AppProps;
+}
+
+const Routes = ({ appProps }: RoutesProps): JSX.Element => {
   return (
     <Switch>
       <AppliedRoute path="/" exact component={Home} appProps={appProps} />
       <AppliedRoute path="/login" exact component={Login} appProps={appProps} />
-      { /* Finally, catch all unmatched routes */ }
       <Route component={NotFound} />
     </Switch>
   );
-}
+};
+
+export default Routes;
 ```
 
-<img class="code-marker" src="/assets/s.png" />And import the new component in the header of `src/Routes.js`.
+<img class="code-marker" src="/assets/s.png" />And import the new component in the header of `src/Routes.tsx`.
 
 ``` coffee
 import AppliedRoute from "./components/AppliedRoute";
@@ -115,15 +150,26 @@ import AppliedRoute from "./components/AppliedRoute";
 
 Now in the `Login` container we'll call the `userHasAuthenticated` method.
 
-<img class="code-marker" src="/assets/s.png" />Replace the `alert('Logged in');` line with the following in `src/containers/Login.js`.
+<img class="code-marker" src="/assets/s.png" />Replace the `alert('Logged in');` line with the following in `src/containers/Login.tsx`.
 
 ``` javascript
 props.userHasAuthenticated(true);
 ```
 
+and add the type defintion to the props: 
+
+``` typescript
+import { AppProps } from "../App";
+interface LoginProps extends AppProps {}
+
+const Login = (props: LoginProps) => {
+...
+}
+```
+
 ### Create a Logout Button
 
-We can now use this to display a Logout button once the user logs in. Find the following in our `src/App.js`.
+We can now use this to display a Logout button once the user logs in. Find the following in our `src/App.tsx`.
 
 ``` coffee
 <LinkContainer to="/signup">
@@ -152,12 +198,12 @@ We can now use this to display a Logout button once the user logs in. Find the f
 
 The `<>` or [Fragment component](https://reactjs.org/docs/fragments.html) can be thought of as a placeholder component. We need this because in the case the user is not logged in, we want to render two links. To do this we would need to wrap it inside a single component, like a `div`. But by using the Fragment component it tells React that the two links are inside this component but we don't want to render any extra HTML.
 
-<img class="code-marker" src="/assets/s.png" />And add this `handleLogout` method to `src/App.js` above the `return` statement as well.
+<img class="code-marker" src="/assets/s.png" />And add this `handleLogout` method to `src/App.tsx` above the `return` statement as well.
 
 ``` javascript
-function handleLogout() {
-  userHasAuthenticated(false);
-}
+const handleLogout = () => {
+    userHasAuthenticated(false);
+};
 ```
 
 Now head over to your browser and try logging in with the admin credentials we created in the [Create a Cognito Test User]({% link _chapters/create-a-cognito-test-user.md %}) chapter. You should see the Logout button appear right away.

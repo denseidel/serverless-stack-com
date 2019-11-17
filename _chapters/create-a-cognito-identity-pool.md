@@ -111,3 +111,5 @@ Take a note of the **Identity pool ID** which will be required in the later chap
 ![Cognito Identity Pool Created Screenshot](/assets/cognito-identity-pool/identity-pool-id.png)
 
 Now before we test our serverless API let's take a quick look at the Cognito User Pool and Cognito Identity Pool and make sure we've got a good idea of the two concepts and the differences between them.
+
+TODO: Add a link to an automated creation with terraform or cloudformation.

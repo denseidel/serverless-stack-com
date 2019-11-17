@@ -27,7 +27,7 @@ This installs the NPM package and adds the dependency to your `package.json`.
 
 Let's first create a configuration file for our app that'll reference all the resources we have created.
 
-<img class="code-marker" src="/assets/s.png" />Create a file at `src/config.js` and add the following.
+<img class="code-marker" src="/assets/s.png" />Create a file at `src/config.ts` and add the following.
 
 ``` coffee
 export default {
@@ -62,7 +62,7 @@ Here you need to replace the following:
 
 Next we'll set up AWS Amplify.
 
-<img class="code-marker" src="/assets/s.png" />Import it by adding the following to the header of your `src/index.js`.
+<img class="code-marker" src="/assets/s.png" />Import it by adding the following to the header of your `src/index.ts`.
 
 ``` coffee
 import Amplify from 'aws-amplify';
@@ -70,7 +70,7 @@ import Amplify from 'aws-amplify';
 
 And import the config we created above. 
 
-<img class="code-marker" src="/assets/s.png" />Add the following, also to the header of your `src/index.js`.
+<img class="code-marker" src="/assets/s.png" />Add the following, also to the header of your `src/index.ts`.
 
 ``` coffee
 import config from './config';

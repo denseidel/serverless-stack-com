@@ -20,7 +20,7 @@ Let's start by creating the outer chrome of our application by first adding a na
 $ rm src/logo.svg
 ```
 
-<img class="code-marker" src="/assets/s.png" />And go ahead and remove the code inside `src/App.js` and replace it with the following.
+<img class="code-marker" src="/assets/s.png" />And go ahead and remove the code inside `src/App.tsx` and replace it with the following.
 
 ``` coffee
 import React from "react";
@@ -28,7 +28,7 @@ import { Link } from "react-router-dom";
 import { Navbar } from "react-bootstrap";
 import "./App.css";
 
-function App(props) {
+const App = (): JSX.Element => {
   return (
     <div className="App container">
       <Navbar fluid collapseOnSelect>
@@ -41,7 +41,7 @@ function App(props) {
       </Navbar>
     </div>
   );
-}
+};
 
 export default App;
 ```
@@ -78,13 +78,13 @@ $ mkdir src/containers/
 
 We'll be storing all of our top level components here. These are components that will respond to our routes and make requests to our API. We will be calling them *containers* through the rest of this tutorial.
 
-<img class="code-marker" src="/assets/s.png" />Create a new container and add the following to `src/containers/Home.js`.
+<img class="code-marker" src="/assets/s.png" />Create a new container and add the following to `src/containers/Home.tsx`.
 
 ``` coffee
 import React from "react";
 import "./Home.css";
 
-export default function Home() {
+const Home: React.FC = () => {
   return (
     <div className="Home">
       <div className="lander">
@@ -93,7 +93,9 @@ export default function Home() {
       </div>
     </div>
   );
-}
+};
+
+export default Home;
 ```
 
 This simply renders our homepage given that the user is not currently signed in.
@@ -122,20 +124,22 @@ Now let's add a few lines to style this.
 
 Now we'll set up the routes so that we can have this container respond to the `/` route.
 
-<img class="code-marker" src="/assets/s.png" />Create `src/Routes.js` and add the following into it.
+<img class="code-marker" src="/assets/s.png" />Create `src/Routes.tsx` and add the following into it.
 
 ``` coffee
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import Home from "./containers/Home";
 
-export default function Routes() {
+const Routes: React.FC = () => {
   return (
     <Switch>
       <Route path="/" exact component={Home} />
     </Switch>
   );
-}
+};
+
+export default Routes;
 ```
 
 This component uses this `Switch` component from React-Router that renders the first matching route that is defined within it. For now we only have a single route, it looks for `/` and renders the `Home` component when matched. We are also using the `exact` prop to ensure that it matches the `/` route exactly. This is because the path `/` will also match any route that starts with a `/`.
@@ -156,10 +160,16 @@ import Routes from "./Routes";
 <Routes />
 ```
 
-So the `App` function component of our `src/App.js` should now look like this.
+So the `App` function component of our `src/App.tsx` should now look like this.
 
 ``` coffee
-function App(props) {
+import React from "react";
+import { Link } from "react-router-dom";
+import { Navbar } from "react-bootstrap";
+import "./App.css";
+import Routes from "./Routes";
+
+const App = (): JSX.Element => {
   return (
     <div className="App container">
       <Navbar fluid collapseOnSelect>
@@ -173,7 +183,9 @@ function App(props) {
       <Routes />
     </div>
   );
-}
+};
+
+export default App;
 ```
 
 This ensures that as we navigate to different routes in our app, the portion below the navbar will change to reflect that.

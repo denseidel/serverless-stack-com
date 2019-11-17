@@ -10,7 +10,7 @@ comments_id: adding-links-in-the-navbar/141
 
 Now that we have our first route set up, let's add a couple of links to the navbar of our app. These will direct users to login or signup for our app when they first visit it.
 
-<img class="code-marker" src="/assets/s.png" />Replace the `App` function component in `src/App.js` with the following.
+<img class="code-marker" src="/assets/s.png" />Replace the `App` function component in `src/App.tsx` with the following.
 
 ``` coffee
 function App(props) {
@@ -40,7 +40,7 @@ This adds two links to our navbar using the `NavItem` Bootstrap component. The `
 
 And let's include the necessary components in the header.
 
-<img class="code-marker" src="/assets/s.png" />Replace the `react-router-dom` and `react-bootstrap` import in `src/App.js` with this.
+<img class="code-marker" src="/assets/s.png" />Replace the `react-router-dom` and `react-bootstrap` import in `src/App.tsx` with this.
 
 ``` coffee
 import { Link } from "react-router-dom";
@@ -58,19 +58,19 @@ To fix this we need a component that works with React Router and React Bootstrap
 <img class="code-marker" src="/assets/s.png" />Run the following command in your working directory.
 
 ``` bash
-$ npm install react-router-bootstrap --save
+$ npm install react-router-bootstrap @types/react-router-bootstrap --save
 ```
 
-<img class="code-marker" src="/assets/s.png" />And include it at the top of your `src/App.js`.
+<img class="code-marker" src="/assets/s.png" />And include it at the top of your `src/App.tsx`.
 
 ``` coffee
 import { LinkContainer } from "react-router-bootstrap";
 ```
 
-<img class="code-marker" src="/assets/s.png" />We will now wrap our links with the `LinkContainer`. Replace the `App` function component in your `src/App.js` with this.
+<img class="code-marker" src="/assets/s.png" />We will now wrap our links with the `LinkContainer`. Replace the `App` function component in your `src/App.tsx` with this.
 
 ``` coffee
-function App(props) {
+const App = (): JSX.Element => {
   return (
     <div className="App container">
       <Navbar fluid collapseOnSelect>
@@ -94,7 +94,9 @@ function App(props) {
       <Routes />
     </div>
   );
-}
+};
+
+export default App;
 ```
 
 And that's it! Now if you flip over to your browser and click on the login link, you should see the link highlighted in the navbar. Also, it doesn't refresh the page while redirecting.

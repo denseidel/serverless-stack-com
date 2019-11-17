@@ -14,14 +14,14 @@ So let's start by creating the basic form that'll take the user's email (as thei
 
 ### Add the Container
 
-<img class="code-marker" src="/assets/s.png" />Create a new file `src/containers/Login.js` and add the following.
+<img class="code-marker" src="/assets/s.png" />Create a new file `src/containers/Login.tsx` and add the following.
 
 ``` coffee
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import { Button, FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import "./Login.css";
 
-export default function Login(props) {
+const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -29,7 +29,7 @@ export default function Login(props) {
     return email.length > 0 && password.length > 0;
   }
 
-  function handleSubmit(event) {
+  function handleSubmit(event: FormEvent) {
     event.preventDefault();
   }
 
@@ -42,6 +42,7 @@ export default function Login(props) {
             autoFocus
             type="email"
             value={email}
+            // @ts-ignore
             onChange={e => setEmail(e.target.value)}
           />
         </FormGroup>
@@ -49,6 +50,7 @@ export default function Login(props) {
           <ControlLabel>Password</ControlLabel>
           <FormControl
             value={password}
+            // @ts-ignore
             onChange={e => setPassword(e.target.value)}
             type="password"
           />
@@ -59,8 +61,12 @@ export default function Login(props) {
       </form>
     </div>
   );
-}
+};
+
+export default Login;
 ```
+
+TODO: Fix type problem with form onChange events https://github.com/DefinitelyTyped/DefinitelyTyped/issues/16208
 
 We are introducing a couple of new concepts in this.
 
@@ -95,7 +101,7 @@ These styles roughly target any non-mobile screen sizes.
 
 ### Add the Route
 
-<img class="code-marker" src="/assets/s.png" />Now we link this container up with the rest of our app by adding the following line to `src/Routes.js` below our home `<Route>`.
+<img class="code-marker" src="/assets/s.png" />Now we link this container up with the rest of our app by adding the following line to `src/Routes.tsx` below our home `<Route>`.
 
 ``` coffee
 <Route path="/login" exact component={Login} />

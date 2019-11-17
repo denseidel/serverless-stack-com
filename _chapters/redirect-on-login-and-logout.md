@@ -13,17 +13,21 @@ To complete the login flow we are going to need to do two more things.
 1. Redirect the user to the homepage after they login.
 2. And redirect them back to the login page after they logout.
 
-We are going to use the `history.push` method that comes with React Router v4.
+We are going to use the `history.push` method that comes with React Router v4 using [react hooks](https://dev.to/finallynero/hooks-introduced-in-react-router-v5-1-7g8). Make sure React Router's version is `5.1.+`
+
+``` bash
+npm upgrade react-router-dom @types/react-router-dom
+```
 
 ### Redirect to Home on Login
 
 Since our `Login` component is rendered using a `Route`, it adds the router props to it. So we can redirect using the `this.props.history.push` method.
 
 ``` javascript
-props.history.push("/");
+history.push("/");
 ```
 
-<img class="code-marker" src="/assets/s.png" />Update the `handleSubmit` method in `src/containers/Login.js` to look like this:
+<img class="code-marker" src="/assets/s.png" />Update the `handleSubmit` method in `src/containers/Login.tsx` to look like this:
 
 ``` javascript
 async function handleSubmit(event) {
@@ -45,32 +49,25 @@ Now if you head over to your browser and try logging in, you should be redirecte
 
 ### Redirect to Login After Logout
 
-Now we'll do something very similar for the logout process. However, the `App` component does not have access to the router props directly since it is not rendered inside a `Route` component. To be able to use the router props in our `App` component we will need to use the `withRouter` [Higher-Order Component](https://facebook.github.io/react/docs/higher-order-components.html) (or HOC). You can read more about the `withRouter` HOC [here](https://reacttraining.com/react-router/web/api/withRouter).
+Now we'll do something very similar for the logout process. However, the `App` component does not have access to the router props directly since it is not rendered inside a `Route` component. To be able to use the router props in our `App` component we will need to use the `withRouter` [Higher-Order Component](https://facebook.github.io/react/docs/higher-order-components.html) (or HOC). You can read more about the `withRouter` HOC [here](https://reacttraining.com/react-router/web/api/withRouter). This is quite [unconfortable](https://www.dev-eth0.de/2019/09/10/using-withrouter-in-a-typescript-react-component/#fn:react-router51) in Typescript and `withRouter` will be [deprecated](https://reacttraining.com/blog/react-router-v5-1/) at some point. Therefore the prefered way is to [use](https://dev.to/finallynero/hooks-introduced-in-react-router-v5-1-7g8) the `useHistory` hook.
 
 To use this HOC, we'll change the way we export our App component.
 
-<img class="code-marker" src="/assets/s.png" />Replace the following line in `src/App.js`.
+<img class="code-marker" src="/assets/s.png" />Add the following import and then the hook to the top of the App component in `src/App.tsx`:
 
-``` coffee
-export default App;
+``` javascript
+import { useHistory } from "react-router-dom";
 ```
 
-<img class="code-marker" src="/assets/s.png" />With this.
-
 ``` coffee
-export default withRouter(App);
+let history = useHistory();
 ```
 
-<img class="code-marker" src="/assets/s.png" />And import `withRouter` by replacing the `import { Link }` line in the header of `src/App.js` with this:
+
+<img class="code-marker" src="/assets/s.png" />Add the following to the bottom of the `handleLogout` function in our `src/App.tsx`.
 
 ``` coffee
-import { Link, withRouter } from "react-router-dom";
-```
-
-<img class="code-marker" src="/assets/s.png" />Add the following to the bottom of the `handleLogout` function in our `src/App.js`.
-
-``` coffee
-props.history.push("/login");
+history.push("/login");
 ```
 
 So our `handleLogout` method should now look like this.
@@ -78,10 +75,8 @@ So our `handleLogout` method should now look like this.
 ``` javascript
 async function handleLogout() {
   await Auth.signOut();
-
   userHasAuthenticated(false);
-
-  props.history.push("/login");
+  history.push("/login");
 }
 ```
 

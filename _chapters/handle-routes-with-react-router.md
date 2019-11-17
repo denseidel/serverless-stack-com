@@ -18,16 +18,16 @@ Let's start by installing React Router. We are going to be using the React Route
 <img class="code-marker" src="/assets/s.png" />Run the following command in your working directory.
 
 ``` bash
-$ npm install react-router-dom@5.0.1 --save
+$ npm install react-router-dom@5.0.1 @types/react-router-dom --save
 ```
 
 This installs the NPM package and adds the dependency to your `package.json`.
 
 ### Setting up React Router
 
-Even though we don't have any routes set up in our app, we can get the basic structure up and running. Our app currently runs from the `App` component in `src/App.js`. We are going to be using this component as the container for our entire app. To do that we'll encapsulate our `App` component within a `Router`.
+Even though we don't have any routes set up in our app, we can get the basic structure up and running. Our app currently runs from the `App` component in `src/App.tsx`. We are going to be using this component as the container for our entire app. To do that we'll encapsulate our `App` component within a `Router`.
 
-<img class="code-marker" src="/assets/s.png" />Replace the following code in `src/index.js`:
+<img class="code-marker" src="/assets/s.png" />Replace the following code in `src/index.tsx`:
 
 ``` coffee
 ReactDOM.render(<App />, document.getElementById('root'));

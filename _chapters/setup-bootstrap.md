@@ -16,6 +16,7 @@ A big part of writing web applications is having a UI Kit to help create the int
 
 ``` bash
 $ npm install react-bootstrap@0.33.0 --save
+$ npm install @types/react-bootstrap --save-dev
 ```
 
 This installs the NPM package and adds the dependency to your `package.json`.
@@ -50,3 +51,5 @@ We are also setting the width of the input type file to prevent the page on mobi
 Now if you head over to your browser, you might notice that the styles have shifted a bit. This is because Bootstrap includes [Normalize.css](http://necolas.github.io/normalize.css/) to have a more consistent styles across browsers.
 
 Next, we are going to create a few routes for our application and set up the React Router.
+
+TODO: Check if I can reuse AntDesign.
