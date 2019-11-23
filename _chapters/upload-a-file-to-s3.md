@@ -11,27 +11,33 @@ comments_id: comments-for-upload-a-file-to-s3/123
 Let's now add an attachment to our note. The flow we are using here is very simple.
 
 1. The user selects a file to upload.
-2. The file is uploaded to S3 under the user's folder and we get a key back. 
+2. The file is uploaded to S3 under the user's folder and we get a key back.
 3. Create a note with the file key as the attachment.
 
-We are going to use the Storage module that AWS Amplify has. If you recall, that back in the [Create a Cognito identity pool]({% link _chapters/create-a-cognito-identity-pool.md %}) chapter we allow a logged in user access to a folder inside our S3 Bucket. AWS Amplify stores directly to this folder if we want to *privately* store a file.
+We are going to use the Storage module that AWS Amplify has. If you recall, that back in the [Create a Cognito identity pool]({% link _chapters/create-a-cognito-identity-pool.md %}) chapter we allow a logged in user access to a folder inside our S3 Bucket. AWS Amplify stores directly to this folder if we want to _privately_ store a file.
 
 Also, just looking ahead a bit; we will be uploading files when a note is created and when a note is edited. So let's create a simple convenience method to help with that.
 
-
 ### Upload to S3
 
-<img class="code-marker" src="/assets/s.png" />Add the following to `src/libs/awsLib.js`.
+<img class="code-marker" src="/assets/s.png" />Add the following to `src/libs/awsLib.ts`.
 
-``` javascript
+```javascript
 import { Storage } from "aws-amplify";
 
-export async function s3Upload(file) {
+// no custome File interface required the default typescript type can be used
+
+interface S3Result {
+  key: string
+}
+
+
+export async function s3Upload(file: File) {
   const filename = `${Date.now()}-${file.name}`;
 
   const stored = await Storage.vault.put(filename, file, {
     contentType: file.type
-  });
+  }) as S3Result;
 
   return stored.key;
 }
@@ -51,12 +57,11 @@ The above method does a couple of things.
 
 Now that we have our upload methods ready, let's call them from the create note method.
 
-<img class="code-marker" src="/assets/s.png" />Replace the `handleSubmit` method in `src/containers/NewNote.js` with the following.
+<img class="code-marker" src="/assets/s.png" />Replace the `handleSubmit` method in `src/containers/NewNote.tsx` with the following.
 
-``` javascript
-async function handleSubmit(event) {
+```javascript
+const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
   event.preventDefault();
-
   if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
     alert(
       `Please pick a file smaller than ${config.MAX_ATTACHMENT_SIZE /
@@ -64,26 +69,34 @@ async function handleSubmit(event) {
     );
     return;
   }
-
   setIsLoading(true);
-
   try {
-    const attachment = file.current
-      ? await s3Upload(file.current)
-      : null;
-
+    const attachment = file.current ? await s3Upload(file.current) : null;
     await createNote({ content, attachment });
-    props.history.push("/");
+    history.push("/");
   } catch (e) {
     alert(e);
     setIsLoading(false);
   }
-}
+};
 ```
 
-<img class="code-marker" src="/assets/s.png" />And make sure to include `s3Upload` by adding the following to the header of `src/containers/NewNote.js`.
+Add the `attachment` property to the input `Note` interfaces of `createNote`.
 
-``` javascript
+```javascript
+const createNote: (note: {
+  content: string,
+  attachment: string | null
+}) => Promise<any> = note => {
+  return API.post("notes", "/notes", {
+    body: note
+  });
+};
+```
+
+<img class="code-marker" src="/assets/s.png" />And make sure to include `s3Upload` by adding the following to the header of `src/containers/NewNote.tsx`.
+
+```javascript
 import { s3Upload } from "../libs/awsLib";
 ```
 

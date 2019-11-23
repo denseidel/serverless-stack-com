@@ -14,25 +14,25 @@ It's important that we give the user some feedback while we are logging them in.
 
 <img class="code-marker" src="/assets/s.png" />To do this we are going to add an `isLoading` flag to the state of our `src/containers/Login.tsx`. Add the following to the top of our `Login` function component.
 
-``` javascript
+```javascript
 const [isLoading, setIsLoading] = useState(false);
 ```
 
 <img class="code-marker" src="/assets/s.png" />And we'll update it while we are logging in. So our `handleSubmit` function now looks like so:
 
-``` javascript
+```javascript
 const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    setIsLoading(true);
-    try {
-      await Auth.signIn(email, password);
-      props.userHasAuthenticated(true);
-      props.history.push("/");
-    } catch (e) {
-      alert(e.message);
-      setIsLoading(false);
-    }
-  };
+  event.preventDefault();
+  setIsLoading(true);
+  try {
+    await Auth.signIn(email, password);
+    props.userHasAuthenticated(true);
+    props.history.push("/");
+  } catch (e) {
+    alert(e.message);
+    setIsLoading(false);
+  }
+};
 ```
 
 ### Create a Loader Button
@@ -41,7 +41,7 @@ Now to reflect the state change in our button we are going to render it differen
 
 <img class="code-marker" src="/assets/s.png" />Create a new file and add the following in `src/components/LoaderButton.tsx`.
 
-``` coffee
+```coffee
 import React from "react";
 import { Button, Glyphicon } from "react-bootstrap";
 import "./LoaderButton.css";
@@ -49,7 +49,7 @@ import "./LoaderButton.css";
 interface LoaderButton extends Button.ButtonProps {
   isLoading: boolean;
   className?: string;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 const LoaderButton: React.FC<LoaderButton> = ({
@@ -79,15 +79,19 @@ And let's add a couple of styles to animate our loading icon.
 
 <img class="code-marker" src="/assets/s.png" />Add the following to `src/components/LoaderButton.css`.
 
-``` css
+```css
 .LoaderButton .spinning.glyphicon {
   margin-right: 7px;
   top: 2px;
   animation: spin 1s infinite linear;
 }
 @keyframes spin {
-  from { transform: scale(1) rotate(0deg); }
-  to { transform: scale(1) rotate(360deg); }
+  from {
+    transform: scale(1) rotate(0deg);
+  }
+  to {
+    transform: scale(1) rotate(360deg);
+  }
 }
 ```
 
@@ -99,21 +103,21 @@ Now we can use our new component in our `Login` container.
 
 <img class="code-marker" src="/assets/s.png" />In `src/containers/Login.tsx` find the `<Button>` component in the `return` statement.
 
-``` html
-<Button block bsSize="large" disabled={!validateForm()} type="submit">
+```html
+<button block bsSize="large" disabled="{!validateForm()}" type="submit">
   Login
-</Button>
+</button>
 ```
 
 <img class="code-marker" src="/assets/s.png" />And replace it with this.
 
-``` html
+```html
 <LoaderButton
   block
   type="submit"
   bsSize="large"
-  isLoading={isLoading}
-  disabled={!validateForm()}
+  isLoading="{isLoading}"
+  disabled="{!validateForm()}"
 >
   Login
 </LoaderButton>
@@ -121,7 +125,7 @@ Now we can use our new component in our `Login` container.
 
 <img class="code-marker" src="/assets/s.png" />Also, import the `LoaderButton` in the header. And remove the reference to the `Button` component.
 
-``` javascript
+```javascript
 import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 ```

@@ -12,18 +12,18 @@ Now that we have our basic create note form working, let's connect it to our API
 
 We just need to use the `API` module that AWS Amplify has.
 
-<img class="code-marker" src="/assets/s.png" />Let's include the `API` module by adding the following to the header of `src/containers/NewNote.js`.
+<img class="code-marker" src="/assets/s.png" />Let's include the `API` module by adding the following to the header of `src/containers/NewNote.tsx`.
 
-``` javascript
+```javascript
 import { API } from "aws-amplify";
 ```
 
 <img class="code-marker" src="/assets/s.png" />And replace our `handleSubmit` function with the following.
 
-``` javascript
-async function handleSubmit(event) {
+```javascript
+const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
   event.preventDefault();
-
+  //@ts-ignore
   if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
     alert(
       `Please pick a file smaller than ${config.MAX_ATTACHMENT_SIZE /
@@ -31,23 +31,21 @@ async function handleSubmit(event) {
     );
     return;
   }
-
   setIsLoading(true);
-
   try {
     await createNote({ content });
-    props.history.push("/");
+    history.push("/");
   } catch (e) {
     alert(e);
     setIsLoading(false);
   }
-}
+};
 
-function createNote(note) {
+const createNote: (note: { content: string }) => Promise<any> = note => {
   return API.post("notes", "/notes", {
     body: note
   });
-}
+};
 ```
 
 This does a couple of simple things.

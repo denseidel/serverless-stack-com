@@ -12,47 +12,50 @@ Now that we are able to create a new note, let's create a page where we can see 
 
 Currently, our Home container is very simple. Let's add the conditional rendering in there.
 
-<img class="code-marker" src="/assets/s.png" />Replace our `src/containers/Home.js` with the following.
+<img class="code-marker" src="/assets/s.png" />Replace our `src/containers/Home.tsx` with the following.
 
-``` coffee
+```coffee
 import React, { useState, useEffect } from "react";
 import { PageHeader, ListGroup } from "react-bootstrap";
 import "./Home.css";
+import { AppProps } from "../App";
 
-export default function Home(props) {
+interface HomeProps extends AppProps {}
+
+const Home: React.FC<HomeProps> = props => {
   const [notes, setNotes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  function renderNotesList(notes) {
+  const renderNotesList = notes => {
     return null;
-  }
+  };
 
-  function renderLander() {
+  const renderLander = () => {
     return (
       <div className="lander">
         <h1>Scratch</h1>
         <p>A simple note taking app</p>
       </div>
     );
-  }
+  };
 
-  function renderNotes() {
+  const renderNotes = () => {
     return (
       <div className="notes">
         <PageHeader>Your Notes</PageHeader>
-        <ListGroup>
-          {!isLoading && renderNotesList(notes)}
-        </ListGroup>
+        <ListGroup>{!isLoading && renderNotesList(notes)}</ListGroup>
       </div>
     );
-  }
+  };
 
   return (
     <div className="Home">
       {props.isAuthenticated ? renderNotes() : renderLander()}
     </div>
   );
-}
+};
+
+export default Home;
 ```
 
 We are doing a few things of note here:

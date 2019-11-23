@@ -13,40 +13,39 @@ Now let's go ahead and implement the `handleSubmit` and `handleConfirmationSubmi
 <img class="code-marker" src="/assets/s.png" />Replace our `handleSubmit` and `handleConfirmationSubmit` functions in `src/containers/Signup.js` with the following.
 
 ``` javascript
-async function handleSubmit(event) {
-  event.preventDefault();
+async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    const newUser = await Auth.signUp({
-      username: fields.email,
-      password: fields.password
-    });
-    setIsLoading(false);
-    setNewUser(newUser);
-  } catch (e) {
-    alert(e.message);
-    setIsLoading(false);
+    try {
+      const newUser = await Auth.signUp({
+        username: fields.email,
+        password: fields.password
+      });
+      setIsLoading(false);
+      setNewUser(newUser);
+    } catch (e) {
+      alert(e.message);
+      setIsLoading(false);
+    }
   }
-}
 
-async function handleConfirmationSubmit(event) {
-  event.preventDefault();
+  async function handleConfirmationSubmit(event: React.FormEvent) {
+    event.preventDefault();
 
-  setIsLoading(true);
+    setIsLoading(true);
+    try {
+      await Auth.confirmSignUp(fields.email, fields.confirmationCode);
+      await Auth.signIn(fields.email, fields.password);
 
-  try {
-    await Auth.confirmSignUp(fields.email, fields.confirmationCode);
-    await Auth.signIn(fields.email, fields.password);
-
-    props.userHasAuthenticated(true);
-    props.history.push("/");
-  } catch (e) {
-    alert(e.message);
-    setIsLoading(false);
+      props.userHasAuthenticated(true);
+      history.push("/");
+    } catch (e) {
+      alert(e.message);
+      setIsLoading(false);
+    }
   }
-}
 ```
 
 <img class="code-marker" src="/assets/s.png" />Also, include the Amplify Auth in our header.

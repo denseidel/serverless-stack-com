@@ -12,9 +12,9 @@ Now that we have our basic homepage set up, let's make the API call to render ou
 
 ### Make the Request
 
-<img class="code-marker" src="/assets/s.png" />Add the following right below the state variable declarations in `src/containers/Home.js`.
+<img class="code-marker" src="/assets/s.png" />Add the following right below the state variable declarations in `src/containers/Home.tsx`.
 
-``` javascript
+```javascript
 useEffect(() => {
   async function onLoad() {
     if (!props.isAuthenticated) {
@@ -34,9 +34,13 @@ useEffect(() => {
   onLoad();
 }, [props.isAuthenticated]);
 
-function loadNotes() {
-  return API.get("notes", "/notes");
-}
+const loadNotes = () => {
+  let init = {
+    // OPTIONAL
+    headers: {} // OPTIONAL
+  };
+  return API.get("notes", "/notes", init);
+};
 ```
 
 We are using the [useEffect React Hook](https://reactjs.org/docs/hooks-effect.html). We covered how this works back in the [Load the State from the Session]({% link _chapters/load-the-state-from-the-session.md %}) chapter.
@@ -45,7 +49,7 @@ Let's quickly go over how we are using it here. We want to make a request to our
 
 <img class="code-marker" src="/assets/s.png" />And include our Amplify API module in the header.
 
-``` javascript
+```javascript
 import { API } from "aws-amplify";
 ```
 
@@ -55,16 +59,9 @@ Now let's render the results.
 
 <img class="code-marker" src="/assets/s.png" />Replace our `renderNotesList` placeholder method with the following.
 
-``` coffee
-function renderNotesList(notes) {
-  return [{}].concat(notes).map((note, i) =>
-    i !== 0 ? (
-      <LinkContainer key={note.noteId} to={`/notes/${note.noteId}`}>
-        <ListGroupItem header={note.content.trim().split("\n")[0]}>
-          {"Created: " + new Date(note.createdAt).toLocaleString()}
-        </ListGroupItem>
-      </LinkContainer>
-    ) : (
+```coffee
+const renderNotesList = (notes: Note[]) => {
+    const createButton = (
       <LinkContainer key="new" to="/notes/new">
         <ListGroupItem>
           <h4>
@@ -72,26 +69,43 @@ function renderNotesList(notes) {
           </h4>
         </ListGroupItem>
       </LinkContainer>
-    )
-  );
-}
+    );
+    const noteList = notes.map(note => (
+      <LinkContainer key={note.noteId} to={`/notes/${note.noteId}`}>
+        <ListGroupItem header={note.content.trim().split("\n")[0]}>
+          {"Created: " + new Date(note.createdAt).toLocaleString()}
+        </ListGroupItem>
+      </LinkContainer>
+    ));
+    return [createButton, noteList];
+  };
+```
+
+Also add a `Note` type to the top of the file:
+
+```javascript
+type Note = {
+  noteId: string,
+  content: string,
+  createdAt: string
+};
 ```
 
 <img class="code-marker" src="/assets/s.png" />And include the `ListGroupItem` in the header so that our `react-bootstrap` import looks like so.
 
-``` javascript
+```javascript
 import { PageHeader, ListGroup, ListGroupItem } from "react-bootstrap";
 ```
 
 <img class="code-marker" src="/assets/s.png" />Also include the `LinkContainer` from `react-router-bootstrap`.
 
-``` javascript
+```javascript
 import { LinkContainer } from "react-router-bootstrap";
 ```
 
 The code above does a few things.
 
-1. It always renders a **Create a new note** button as the first item in the list (even if the list is empty). We do this by concatenating an array with an empty object with our `notes` array.
+1. It always renders a **Create a new note** button as the first item in the list (even if the list is empty).
 
 2. We render the first line of each note as the `ListGroupItem` header by doing `note.content.trim().split('\n')[0]`.
 
@@ -99,7 +113,7 @@ The code above does a few things.
 
 <img class="code-marker" src="/assets/s.png" />Let's also add a couple of styles to our `src/containers/Home.css`.
 
-``` css
+```css
 .Home .notes h4 {
   font-family: "Open Sans", sans-serif;
   font-weight: 600;
@@ -117,6 +131,6 @@ Now head over to your browser and you should see your list displayed.
 
 ![Homepage list loaded screenshot](/assets/homepage-list-loaded.png)
 
-If you click on each entry, the links should generate URLs with appropriate _noteIds_. For now, these URLs will take you to our 404 page.  We'll fix that in the next section.
+If you click on each entry, the links should generate URLs with appropriate _noteIds_. For now, these URLs will take you to our 404 page. We'll fix that in the next section.
 
 Next up we are going to allow users to view and edit their notes.

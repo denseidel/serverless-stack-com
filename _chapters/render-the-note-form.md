@@ -10,103 +10,111 @@ ref: render-the-note-form
 
 Now that our container loads a note using the 'useEffect()' method, let's go ahead and render the form that we'll use to edit it.
 
-<img class="code-marker" src="/assets/s.png" />Replace our placeholder `return` statement in `src/containers/Notes.js` with the following.
+<img class="code-marker" src="/assets/s.png" />Replace our placeholder `return` statement in `src/containers/Notes.tsx` with the following.
 
-``` coffee
-function validateForm() {
-  return content.length > 0;
-}
+```coffee
+  const validateForm = () => {
+    return content.length > 0;
+  };
 
-function formatFilename(str) {
-  return str.replace(/^\w+-/, "");
-}
+  const formatFilename = (str: string) => {
+    return str.replace(/^\w+-/, "");
+  };
 
-function handleFileChange(event) {
-  file.current = event.target.files[0];
-}
+  const handleFileChange = (
+    event: React.FormEvent<FormControl> & CustomFormEvent
+  ) => {
+    file.current = event.target.files[0];
+  };
 
-async function handleSubmit(event) {
-  let attachment;
+  async function handleSubmit(
+    event: React.FormEvent<HTMLFormElement & CustomFormEvent>
+  ) {
+    let attachment;
 
-  event.preventDefault();
+    event.preventDefault();
 
-  if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
-    alert(
-      `Please pick a file smaller than ${config.MAX_ATTACHMENT_SIZE /
-        1000000} MB.`
+    if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
+      alert(
+        `Please pick a file smaller than ${config.MAX_ATTACHMENT_SIZE /
+          1000000} MB.`
+      );
+      return;
+    }
+
+    setIsLoading(true);
+  }
+
+  async function handleDelete(
+    event: React.MouseEvent<Button, MouseEvent> & CustomFormEvent
+  ) {
+    event.preventDefault();
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this note?"
     );
-    return;
+
+    if (!confirmed) {
+      return;
+    }
+
+    setIsDeleting(true);
   }
 
-  setIsLoading(true);
-}
-
-async function handleDelete(event) {
-  event.preventDefault();
-
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this note?"
-  );
-
-  if (!confirmed) {
-    return;
-  }
-
-  setIsDeleting(true);
-}
-
-return (
-  <div className="Notes">
-    {note && (
-      <form onSubmit={handleSubmit}>
-        <FormGroup controlId="content">
-          <FormControl
-            value={content}
-            componentClass="textarea"
-            onChange={e => setContent(e.target.value)}
-          />
-        </FormGroup>
-        {note.attachment && (
-          <FormGroup>
-            <ControlLabel>Attachment</ControlLabel>
-            <FormControl.Static>
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href={note.attachmentURL}
-              >
-                {formatFilename(note.attachment)}
-              </a>
-            </FormControl.Static>
+  return (
+    <div className="Notes">
+      {note && (
+        <form onSubmit={handleSubmit}>
+          <FormGroup controlId="content">
+            <FormControl
+              value={content}
+              componentClass="textarea"
+              onChange={(e: React.FormEvent<FormControl> & CustomFormEvent) =>
+                setContent(e.target.value)
+              }
+            />
           </FormGroup>
-        )}
-        <FormGroup controlId="file">
-          {!note.attachment && <ControlLabel>Attachment</ControlLabel>}
-          <FormControl onChange={handleFileChange} type="file" />
-        </FormGroup>
-        <LoaderButton
-          block
-          type="submit"
-          bsSize="large"
-          bsStyle="primary"
-          isLoading={isLoading}
-          disabled={!validateForm()}
-        >
-          Save
-        </LoaderButton>
-        <LoaderButton
-          block
-          bsSize="large"
-          bsStyle="danger"
-          onClick={handleDelete}
-          isLoading={isDeleting}
-        >
-          Delete
-        </LoaderButton>
-      </form>
-    )}
-  </div>
-);
+          {note.attachment && (
+            <FormGroup>
+              <ControlLabel>Attachment</ControlLabel>
+              <FormControl.Static>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={note.attachmentURL}
+                >
+                  {formatFilename(note.attachment)}
+                </a>
+              </FormControl.Static>
+            </FormGroup>
+          )}
+          <FormGroup controlId="file">
+            {!note.attachment && <ControlLabel>Attachment</ControlLabel>}
+            <FormControl onChange={handleFileChange} type="file" />
+          </FormGroup>
+          <LoaderButton
+            block
+            type="submit"
+            bsSize="large"
+            bsStyle="primary"
+            isLoading={isLoading}
+            disabled={!validateForm()}
+          >
+            Save
+          </LoaderButton>
+          <LoaderButton
+            block
+            bsSize="large"
+            bsStyle="danger"
+            onClick={handleDelete}
+            isLoading={isDeleting}
+          >
+            Delete
+          </LoaderButton>
+        </form>
+      )}
+    </div>
+  );
 ```
 
 We are doing a few things here:
@@ -123,11 +131,32 @@ We are doing a few things here:
 
 6. Our delete button also confirms with the user if they want to delete the note using the browser's `confirm` dialog.
 
+Further Add some CustomeTypes by creating `libs/customTypes.ts`:
+
+```javascript
+export interface CustomFormEvent {
+  target: {
+    files: File[],
+    value: string, // https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement
+  }
+  preventDefault: () => void,
+}
+
+export type Note = {
+  noteId?: string;
+  content: string;
+  createdAt?: string;
+  attachment?: string; // Name?
+  attachmentURL?: string;
+
+};
+```
+
 To complete this code, let's add `isLoading` and `isDeleting` to the state.
 
 <img class="code-marker" src="/assets/s.png" />So our new state and ref declarations at the top of our `Notes` component function look like this.
 
-``` javascript
+```javascript
 const file = useRef(null);
 const [note, setNote] = useState(null);
 const [content, setContent] = useState("");
@@ -137,7 +166,7 @@ const [isDeleting, setIsDeleting] = useState(false);
 
 <img class="code-marker" src="/assets/s.png" />Let's also add some styles by adding the following to `src/containers/Notes.css`.
 
-``` css
+```css
 .Notes form {
   padding-bottom: 15px;
 }
@@ -150,7 +179,7 @@ const [isDeleting, setIsDeleting] = useState(false);
 
 <img class="code-marker" src="/assets/s.png" />Also, let's include the React-Bootstrap components that we are using here by adding the following to our header. And our styles, the `LoaderButton`, and the `config`.
 
-``` javascript
+```javascript
 import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import config from "../config";

@@ -33,20 +33,26 @@ Let's pull the above logic into a custom React Hook.
 $ mkdir src/libs/
 ```
 
-<img class="code-marker" src="/assets/s.png" />Add the following to `src/libs/hooksLib.js`.
+<img class="code-marker" src="/assets/s.png" />Add the following to `src/libs/hooksLib.ts`.
 
 ``` javascript
 import { useState } from "react";
+import { FormControl } from "react-bootstrap";
 
-export function useFormFields(initialState) {
+interface InitialState {
+  [key: string]: string
+}
+
+export const useFormFields: (initialState: InitialState) => [InitialState, (event: React.FormEvent<FormControl>) => void] = (initialState) => {
   const [fields, setValues] = useState(initialState);
 
   return [
     fields,
-    function(event) {
+    (event: React.FormEvent<FormControl>) => {
+      const castEvent = event as unknown as React.ChangeEvent<HTMLInputElement>;
       setValues({
         ...fields,
-        [event.target.id]: event.target.value
+        [castEvent.target.id]: castEvent.target.value
       });
     }
   ];
@@ -65,17 +71,21 @@ And that's it! We can now use this in our Login component.
 
 ### Using Our Custom Hook
 
-<img class="code-marker" src="/assets/s.png" />Replace our `src/containers/Login.js` with the following:
+<img class="code-marker" src="/assets/s.png" />Replace our `src/containers/Login.tsx` with the following:
 
 ``` coffee
-import React, { useState } from "react";
-import { Auth } from "aws-amplify";
+import React, { useState, FormEvent } from "react";
 import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
+import { Auth } from "aws-amplify";
+import "./Login.css";
+import { AppProps } from "../App";
+import { RouteComponentProps } from "react-router";
 import LoaderButton from "../components/LoaderButton";
 import { useFormFields } from "../libs/hooksLib";
-import "./Login.css";
 
-export default function Login(props) {
+interface LoginProps extends AppProps, RouteComponentProps {}
+
+const Login = (props: LoginProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [fields, handleFieldChange] = useFormFields({
     email: "",
@@ -86,11 +96,9 @@ export default function Login(props) {
     return fields.email.length > 0 && fields.password.length > 0;
   }
 
-  async function handleSubmit(event) {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-
     setIsLoading(true);
-
     try {
       await Auth.signIn(fields.email, fields.password);
       props.userHasAuthenticated(true);
@@ -99,7 +107,7 @@ export default function Login(props) {
       alert(e.message);
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="Login">
@@ -116,9 +124,9 @@ export default function Login(props) {
         <FormGroup controlId="password" bsSize="large">
           <ControlLabel>Password</ControlLabel>
           <FormControl
-            type="password"
             value={fields.password}
             onChange={handleFieldChange}
+            type="password"
           />
         </FormGroup>
         <LoaderButton
@@ -133,7 +141,9 @@ export default function Login(props) {
       </form>
     </div>
   );
-}
+};
+
+export default Login;
 ```
 
 You'll notice that we are using our `useFormFields` Hook. A good way to think about custom React Hooks is to simply replace the line where we use it, with the Hook code itself. So instead of this line:

@@ -10,16 +10,18 @@ ref: save-changes-to-a-note
 
 Now that our note loads into our form, let's work on saving the changes we make to that note.
 
-<img class="code-marker" src="/assets/s.png" />Replace the `handleSubmit` function in `src/containers/Notes.js` with the following.
+<img class="code-marker" src="/assets/s.png" />Replace the `handleSubmit` function in `src/containers/Notes.tsx` with the following.
 
-``` javascript
-function saveNote(note) {
+```javascript
+const saveNote = (note: Note) => {
   return API.put("notes", `/notes/${props.match.params.id}`, {
     body: note
   });
-}
+};
 
-async function handleSubmit(event) {
+const handleSubmit = async (
+  event: React.FormEvent<HTMLFormElement & CustomFormEvent>
+) => {
   let attachment;
 
   event.preventDefault();
@@ -37,23 +39,26 @@ async function handleSubmit(event) {
   try {
     if (file.current) {
       attachment = await s3Upload(file.current);
+    } else if (note !== undefined) {
+      attachment = note.attachment;
     }
 
     await saveNote({
       content,
-      attachment: attachment || note.attachment
+      attachment: attachment,
+      createdAt: undefined
     });
     props.history.push("/");
   } catch (e) {
     alert(e);
     setIsLoading(false);
   }
-}
+};
 ```
 
 <img class="code-marker" src="/assets/s.png" />And include our `s3Upload` helper method in the header:
 
-``` javascript
+```javascript
 import { s3Upload } from "../libs/awsLib";
 ```
 

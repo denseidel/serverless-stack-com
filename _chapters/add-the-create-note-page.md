@@ -14,31 +14,33 @@ First we are going to create the form for a note. It'll take some content and a 
 
 ### Add the Container
 
-<img class="code-marker" src="/assets/s.png" />Create a new file `src/containers/NewNote.js` and add the following.
+<img class="code-marker" src="/assets/s.png" />Create a new file `src/containers/NewNote.tsx` and add the following.
 
-``` coffee
+```coffee
 import React, { useRef, useState } from "react";
 import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import LoaderButton from "../components/LoaderButton";
 import config from "../config";
 import "./NewNote.css";
 
-export default function NewNote(props) {
-  const file = useRef(null);
+const NewNote: React.FC<{}> = props => {
+  const file = useRef<File>();
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const history = useHistory();
 
   function validateForm() {
     return content.length > 0;
   }
 
-  function handleFileChange(event) {
+  function handleFileChange(event: React.FormEvent<FormControl>) {
+    //@ts-ignore https://github.com/microsoft/TypeScript/issues/31816
     file.current = event.target.files[0];
   }
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
+    //@ts-ignore
     if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
       alert(
         `Please pick a file smaller than ${config.MAX_ATTACHMENT_SIZE /
@@ -57,6 +59,7 @@ export default function NewNote(props) {
           <FormControl
             value={content}
             componentClass="textarea"
+            //@ts-ignore
             onChange={e => setContent(e.target.value)}
           />
         </FormGroup>
@@ -77,12 +80,14 @@ export default function NewNote(props) {
       </form>
     </div>
   );
-}
+};
+
+export default NewNote;
 ```
 
 Everything is fairly standard here, except for the file input. Our form elements so far have been [controlled components](https://facebook.github.io/react/docs/forms.html), as in their value is directly controlled by the state of the component. However, in the case of the file input we want the browser to handle this state. So instead of `useState` we'll use the `useRef` hook. The main difference between the two is that `useRef` does not cause the component to re-render. It simply tells React to store a value for us so that we can use it later. We can set/get the current value of a ref by using its `current` property. Just as we do when the user selects a file.
 
-``` javascript
+```javascript
 file.current = event.target.files[0];
 ```
 
@@ -96,7 +101,7 @@ MAX_ATTACHMENT_SIZE: 5000000,
 
 <img class="code-marker" src="/assets/s.png" />Let's also add the styles for our form in `src/containers/NewNote.css`.
 
-``` css
+```css
 .NewNote form {
   padding-bottom: 15px;
 }
@@ -109,15 +114,15 @@ MAX_ATTACHMENT_SIZE: 5000000,
 
 ### Add the Route
 
-<img class="code-marker" src="/assets/s.png" />Finally, add our container as a route in `src/Routes.js` below our signup route. We are using the `AppliedRoute` component that we created in the [Add the session to the state]({% link _chapters/add-the-session-to-the-state.md %}) chapter.
+<img class="code-marker" src="/assets/s.png" />Finally, add our container as a route in `src/Routes.tsx` below our signup route. We are using the `AppliedRoute` component that we created in the [Add the session to the state]({% link _chapters/add-the-session-to-the-state.md %}) chapter.
 
-``` coffee
+```coffee
 <AppliedRoute path="/notes/new" exact component={NewNote} appProps={appProps} />
 ```
 
 <img class="code-marker" src="/assets/s.png" />And include our component in the header.
 
-``` javascript
+```javascript
 import NewNote from "./containers/NewNote";
 ```
 

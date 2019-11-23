@@ -12,7 +12,7 @@ Let's start by creating the signup form that'll get the user's email and passwor
 
 ### Add the Container
 
-<img class="code-marker" src="/assets/s.png" />Create a new container at `src/containers/Signup.js` with the following.
+<img class="code-marker" src="/assets/s.png" />Create a new container at `src/containers/Signup.tsx` with the following.
 
 ``` coffee
 import React, { useState } from "react";
@@ -25,15 +25,20 @@ import {
 import LoaderButton from "../components/LoaderButton";
 import { useFormFields } from "../libs/hooksLib";
 import "./Signup.css";
+import { ISignUpResult } from "amazon-cognito-identity-js";
+import { AppProps } from "../App";
+import { RouteComponentProps, useHistory } from "react-router-dom";
 
-export default function Signup(props) {
+interface SignupProps extends AppProps, RouteComponentProps {}
+
+const Signup: React.FC<SignupProps> = props => {
   const [fields, handleFieldChange] = useFormFields({
     email: "",
     password: "",
     confirmPassword: "",
     confirmationCode: ""
   });
-  const [newUser, setNewUser] = useState(null);
+  const [newUser, setNewUser] = useState((null as unknown) as ISignUpResult);
   const [isLoading, setIsLoading] = useState(false);
 
   function validateForm() {
@@ -137,6 +142,8 @@ export default function Signup(props) {
     </div>
   );
 }
+
+export default Signup;
 ```
 
 Most of the things we are doing here are fairly straightforward but let's go over them quickly.

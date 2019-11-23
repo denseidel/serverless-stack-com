@@ -16,9 +16,9 @@ The first thing we are going to need to do is load the note when our container l
 
 Let's add a route for the note page that we are going to create.
 
-<img class="code-marker" src="/assets/s.png" />Add the following line to `src/Routes.js` **below** our `/notes/new` route. We are using the `AppliedRoute` component that we created in the [Add the session to the state]({% link _chapters/add-the-session-to-the-state.md %}) chapter.
+<img class="code-marker" src="/assets/s.png" />Add the following line to `src/Routes.tsx` **below** our `/notes/new` route. We are using the `AppliedRoute` component that we created in the [Add the session to the state]({% link _chapters/add-the-session-to-the-state.md %}) chapter.
 
-``` coffee
+```coffee
 <AppliedRoute path="/notes/:id" exact component={Notes} appProps={appProps} />
 ```
 
@@ -28,7 +28,7 @@ By using the route path `/notes/:id` we are telling the router to send all match
 
 <img class="code-marker" src="/assets/s.png" />And include our component in the header.
 
-``` javascript
+```javascript
 import Notes from "./containers/Notes";
 ```
 
@@ -36,23 +36,30 @@ Of course this component doesn't exist yet and we are going to create it now.
 
 ### Add the Container
 
-<img class="code-marker" src="/assets/s.png" />Create a new file `src/containers/Notes.js` and add the following.
+<img class="code-marker" src="/assets/s.png" />Create a new file `src/containers/Notes.tsx` and add the following.
 
-``` coffee
+```coffee
 import React, { useRef, useState, useEffect } from "react";
 import { API, Storage } from "aws-amplify";
+import { RouteComponentProps } from "react-router-dom";
 
-export default function Notes(props) {
+type RouteParams = {
+  id: string; // must be type string since route params
+};
+
+interface NotesProps extends RouteComponentProps<RouteParams> {}
+
+const Notes: React.FC<NotesProps> = (props: NotesProps) => {
   const file = useRef(null);
   const [note, setNote] = useState(null);
   const [content, setContent] = useState("");
 
   useEffect(() => {
-    function loadNote() {
-      return API.get("notes", `/notes/${props.match.params.id}`);
-    }
+    const loadNote = () => {
+      return API.get("notes", `/notes/${props.match.params.id}`, {});
+    };
 
-    async function onLoad() {
+    const onLoad = async () => {
       try {
         const note = await loadNote();
         const { content, attachment } = note;
@@ -60,21 +67,20 @@ export default function Notes(props) {
         if (attachment) {
           note.attachmentURL = await Storage.vault.get(attachment);
         }
-
         setContent(content);
         setNote(note);
       } catch (e) {
         alert(e);
       }
-    }
+    };
 
     onLoad();
   }, [props.match.params.id]);
 
-  return (
-    <div className="Notes"></div>
-  );
-}
+  return <div className="Notes"></div>;
+};
+
+export default Notes;
 ```
 
 We are doing a couple of things here.
