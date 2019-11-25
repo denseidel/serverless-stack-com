@@ -12,24 +12,32 @@ Now our settings page is going to have a form that will take a user's credit car
 
 <img class="code-marker" src="/assets/s.png" />From our project root, run the following.
 
-``` bash
-$ npm install --save react-stripe-elements
+```bash
+$ npm install --save react-stripe-elements @types/react-stripe-elements
 ```
 
 Next let's create our billing form component.
 
-<img class="code-marker" src="/assets/s.png" />Add the following to a new file in `src/components/BillingForm.js`.
+<img class="code-marker" src="/assets/s.png" />Add the following to a new file in `src/components/BillingForm.tsx`.
 
 {% raw %}
-``` coffee
-import React, { useState } from "react";
+
+```coffee
+mport React, { useState } from "react";
 import { FormGroup, FormControl, ControlLabel } from "react-bootstrap";
 import { CardElement, injectStripe } from "react-stripe-elements";
 import LoaderButton from "./LoaderButton";
 import { useFormFields } from "../libs/hooksLib";
 import "./BillingForm.css";
 
-function BillingForm({ isLoading, onSubmit, ...props }) {
+const BillingForm: React.FC<{
+  isLoading: boolean;
+  onSubmit: (
+    storage: string,
+    { token, error }: { token: { id: string }; error: any }
+  ) => Promise<void>;
+  stripe?: any;
+}> = ({ isLoading, onSubmit, ...props }) => {
   const [fields, handleFieldChange] = useFormFields({
     name: "",
     storage: ""
@@ -39,25 +47,23 @@ function BillingForm({ isLoading, onSubmit, ...props }) {
 
   isLoading = isProcessing || isLoading;
 
-  function validateForm() {
-    return (
-      fields.name !== "" &&
-      fields.storage !== "" &&
-      isCardComplete
-    );
-  }
+  const validateForm = () => {
+    return fields.name !== "" && fields.storage !== "" && isCardComplete;
+  };
 
-  async function handleSubmitClick(event) {
+  const handleSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setIsProcessing(true);
 
-    const { token, error } = await props.stripe.createToken({ name: fields.name });
+    const { token, error } = await props.stripe.createToken({
+      name: fields.name
+    });
 
     setIsProcessing(false);
 
     onSubmit(fields.storage, { token, error });
-  }
+  };
 
   return (
     <form className="BillingForm" onSubmit={handleSubmitClick}>
@@ -100,10 +106,11 @@ function BillingForm({ isLoading, onSubmit, ...props }) {
       </LoaderButton>
     </form>
   );
-}
+};
 
 export default injectStripe(BillingForm);
 ```
+
 {% endraw %}
 
 Let's quickly go over what we are doing here:
@@ -126,20 +133,20 @@ Also, let's add some styles to the card field so it matches the rest of our UI.
 
 <img class="code-marker" src="/assets/s.png" />Create a file at `src/components/BillingForm.css`.
 
-``` css
+```css
 .BillingForm .card-field {
   margin-bottom: 15px;
   background-color: white;
   padding: 11px 16px;
   border-radius: 6px;
-  border: 1px solid #CCC;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   line-height: 1.3333333;
 }
 
 .BillingForm .card-field.StripeElement--focus {
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
-  border-color: #66AFE9;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  border-color: #66afe9;
 }
 ```
 

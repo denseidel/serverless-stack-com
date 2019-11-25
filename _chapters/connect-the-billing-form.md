@@ -14,52 +14,53 @@ Let's start by including Stripe.js in our HTML.
 
 <img class="code-marker" src="/assets/s.png" />Append the following to the `<head>` block in our `public/index.html`.
 
-``` html
+```html
 <script src="https://js.stripe.com/v3/"></script>
 ```
 
-<img class="code-marker" src="/assets/s.png" />Replace our `return` statement in `src/containers/Settings.js` with this.
+<img class="code-marker" src="/assets/s.png" />Replace our `return` statement in `src/containers/Settings.tsx` with this.
 
-``` coffee
-async function handleFormSubmit(storage, { token, error }) {
-  if (error) {
-    alert(error);
-    return;
-  }
+```coffee
+ const handleFormSubmit = async (
+    storage: string,
+    { token, error }: { token: { id: string }; error: any }
+  ) => {
+    if (error) {
+      alert(error);
+      return;
+    }
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    await billUser({
-      storage,
-      source: token.id
-    });
+    try {
+      await billUser({
+        storage,
+        source: token.id
+      });
 
-    alert("Your card has been charged successfully!");
-    props.history.push("/");
-  } catch (e) {
-    alert(e);
-    setIsLoading(false);
-  }
-}
+      alert("Your card has been charged successfully!");
+      history.push("/");
+    } catch (e) {
+      alert(e);
+      setIsLoading(false);
+    }
+  };
 
-return (
-  <div className="Settings">
-    <StripeProvider apiKey={config.STRIPE_KEY}>
-      <Elements>
-        <BillingForm
-          isLoading={isLoading}
-          onSubmit={handleFormSubmit}
-        />
-      </Elements>
-    </StripeProvider>
-  </div>
-);
+  return (
+    <div className="Settings">
+      <StripeProvider apiKey={config.STRIPE_KEY}>
+        <Elements>
+          <BillingForm isLoading={isLoading} onSubmit={handleFormSubmit} />
+        </Elements>
+      </StripeProvider>
+    </div>
+  );
+};
 ```
 
 <img class="code-marker" src="/assets/s.png" />And add the following to the header.
 
-``` js
+```js
 import { Elements, StripeProvider } from "react-stripe-elements";
 import BillingForm from "../components/BillingForm";
 import config from "../config";
@@ -74,7 +75,7 @@ Finally, let's handle some styles for our settings page as a whole.
 
 <img class="code-marker" src="/assets/s.png" />Create a file named `src/containers/Settings.css` and add the following.
 
-``` css
+```css
 @media all and (min-width: 480px) {
   .Settings {
     padding: 60px 0;

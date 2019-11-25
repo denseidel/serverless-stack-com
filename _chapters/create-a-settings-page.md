@@ -17,46 +17,45 @@ We are going to add a settings page to our app. This is going to allow users to 
 
 To get started let's add our settings page.
 
-<img class="code-marker" src="/assets/s.png" />Create a new file in `src/containers/Settings.js` and add the following.
+<img class="code-marker" src="/assets/s.png" />Create a new file in `src/containers/Settings.tsx` and add the following.
 
-``` coffee
+```coffee
 import React, { useState } from "react";
 import { API } from "aws-amplify";
 
-export default function Settings(props) {
+const Settings: React.FC<{}> = props => {
   const [isLoading, setIsLoading] = useState(false);
 
-  function billUser(details) {
+  function billUser(details: { storage: string; source: string}) {
     return API.post("notes", "/billing", {
       body: details
     });
   }
 
-  return (
-    <div className="Settings">
-    </div>
-  );
-}
+  return <div className="Settings"></div>;
+};
+
+export default Settings;
 ```
 
-<img class="code-marker" src="/assets/s.png" />Next import this component in the header of `src/Routes.js`.
+<img class="code-marker" src="/assets/s.png" />Next import this component in the header of `src/Routes.tsx`.
 
-``` js
+```js
 import Settings from "./containers/Settings";
 ```
 
-<img class="code-marker" src="/assets/s.png" />Add the following below the `/signup` route in our `<Switch>` block in `src/Routes.js`.
+<img class="code-marker" src="/assets/s.png" />Add the following below the `/signup` route in our `<Switch>` block in `src/Routes.tsx`.
 
-``` coffee
+```coffee
 <AppliedRoute path="/settings" exact component={Settings} appProps={appProps} />
 ```
 
-<img class="code-marker" src="/assets/s.png" />Next add a link to our settings page in the navbar by replacing the `return` statement in `src/App.js` with this.
+<img class="code-marker" src="/assets/s.png" />Next add a link to our settings page in the navbar by replacing the `return` statement in `src/App.tsx` with this.
 
 {% raw %}
-``` coffee
-return (
-  !isAuthenticating && (
+
+```coffee
+return isAuthenticating ? null : (
     <div className="App container">
       <Navbar fluid collapseOnSelect>
         <Navbar.Header>
@@ -89,9 +88,9 @@ return (
       </Navbar>
       <Routes appProps={{ isAuthenticated, userHasAuthenticated }} />
     </div>
-  )
-);
+  );
 ```
+
 {% endraw %}
 
 You'll notice that we added another link in the navbar that only displays when a user is logged in.

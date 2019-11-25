@@ -11,18 +11,18 @@ ref: use-the-redirect-routes
 
 Now that we created the `AuthenticatedRoute` and `UnauthenticatedRoute` in the last chapter, let's use them on the containers we want to secure.
 
-<img class="code-marker" src="/assets/s.png" />First import them in the header of `src/Routes.js`.
+<img class="code-marker" src="/assets/s.png" />First import them in the header of `src/Routes.tsx`.
 
-``` javascript
+```javascript
 import AuthenticatedRoute from "./components/AuthenticatedRoute";
 import UnauthenticatedRoute from "./components/UnauthenticatedRoute";
 ```
 
 Next, we simply switch to our new redirect routes.
 
-So the following routes in `src/Routes.js` would be affected.
+So the following routes in `src/Routes.tsx` would be affected.
 
-``` coffee
+```coffee
 <AppliedRoute path="/login" exact component={Login} appProps={appProps} />
 <AppliedRoute path="/signup" exact component={Signup} appProps={appProps} />
 <AppliedRoute path="/settings" exact component={Settings} appProps={appProps} />
@@ -32,7 +32,7 @@ So the following routes in `src/Routes.js` would be affected.
 
 <img class="code-marker" src="/assets/s.png" />They should now look like so:
 
-``` coffee
+```coffee
 <UnauthenticatedRoute path="/login" exact component={Login} appProps={appProps} />
 <UnauthenticatedRoute path="/signup" exact component={Signup} appProps={appProps} />
 <AuthenticatedRoute path="/settings" exact component={Settings} appProps={appProps} />
