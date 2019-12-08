@@ -13,10 +13,10 @@ Our secured pages redirect to the login page when the user is not logged in, wit
 
 Let's start by adding a method to read the `redirect` URL from the querystring.
 
-<img class="code-marker" src="/assets/s.png" />Add the following method to your `src/components/UnauthenticatedRoute.js` below the imports.
+<img class="code-marker" src="/assets/s.png" />Add the following method to your `src/components/UnauthenticatedRoute.tsx` below the imports.
 
-``` coffee
-function querystring(name, url = window.location.href) {
+```coffee
+const querystring = (name: string, url = window.location.href) => {
   name = name.replace(/[[]]/g, "\\$&");
 
   const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)", "i");
@@ -30,7 +30,7 @@ function querystring(name, url = window.location.href) {
   }
 
   return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
+};
 ```
 
 This method takes the querystring param we want to read and returns it.
@@ -39,7 +39,7 @@ Now let's update our component to use this parameter when it redirects.
 
 <img class="code-marker" src="/assets/s.png" />Replace our current `UnauthenticatedRoute` function component with the following.
 
-``` coffee
+```coffee
 export default function UnauthenticatedRoute({ component: C, appProps, ...rest }) {
   const redirect = querystring("redirect");
   return (
@@ -56,9 +56,9 @@ export default function UnauthenticatedRoute({ component: C, appProps, ...rest }
 }
 ```
 
-<img class="code-marker" src="/assets/s.png" />And remove the following from the `handleSubmit` method in `src/containers/Login.js`.
+<img class="code-marker" src="/assets/s.png" />And remove the following from the `handleSubmit` method in `src/containers/Login.tsx`.
 
-``` coffee
+```coffee
 props.history.push("/");
 ```
 
@@ -68,7 +68,7 @@ Now our login page should redirect after we login. And that's it! Our app is rea
 
 <img class="code-marker" src="/assets/s.png" />Let's commit our code so far and push it to GitHub.
 
-``` bash
+```bash
 $ git add .
 $ git commit -m "Building our React app"
 $ git push
