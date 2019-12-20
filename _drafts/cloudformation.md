@@ -12,7 +12,6 @@ When you use AWS CloudFormation, you can reuse your template to set up your reso
 
 In fact, Serverless Framework uses CloudFormation internally.
 
-
 ### Provision resources in serverless.yml
 
 Upon deploying, Serverless Framework translates `serverless.yml` into CloudFormation template and then hands it off to CloudFormation to update the resources. Here is an example,
@@ -34,6 +33,7 @@ functions:
 ```
 
 Serverless Framework creates following resources:
+
 - an S3 bucket to store the code for `handler.js`
 - a Lambda function with code source pointing to the S3 bucket
 - an IAM role granting access to AWS resources (ie. CloudWatch) for Lambda function to assume

@@ -18,7 +18,7 @@ We are going to use the AWS CLI for this.
 
 <img class="code-marker" src="/assets/s.png" />In your terminal, run.
 
-``` bash
+```bash
 $ aws cognito-idp sign-up \
   --region YOUR_DEV_COGNITO_REGION \
   --client-id YOUR_DEV_COGNITO_APP_CLIENT_ID \
@@ -26,24 +26,24 @@ $ aws cognito-idp sign-up \
   --password Passw0rd!
 ```
 
-Refer back to the [Deploying through Seed]({% link _chapters/deploying-through-seed.md %}) chapter to look up the **dev** version of your Cognito App Client Id. And replace `YOUR_DEV_COGNITO_REGION` with the region that you deployed to.
+Refer back to the [Deploying through Github]({% link _chapters/deploying-through-github.md %}) chapter to look up the **dev** version of your Cognito App Client Id. And replace `YOUR_DEV_COGNITO_REGION` with the region that you deployed to.
 
 <img class="code-marker" src="/assets/s.png" />Next we'll confirm the user through the Cognito Admin CLI.
 
-``` bash
+```bash
 $ aws cognito-idp admin-confirm-sign-up \
   --region YOUR_DEV_COGNITO_REGION \
   --user-pool-id YOUR_DEV_COGNITO_USER_POOL_ID \
   --username admin@example.com
 ```
 
-Again, replace `YOUR_DEV_COGNITO_USER_POOL_ID` with the **dev** version of your Cognito User Pool Id from the [Deploying through Seed]({% link _chapters/deploying-through-seed.md %}) chapter and the region from the previous command.
+Again, replace `YOUR_DEV_COGNITO_USER_POOL_ID` with the **dev** version of your Cognito User Pool Id from the [Deploying through Github]({% link _chapters/deploying-through-github.md %}) chapter and the region from the previous command.
 
 Let's quickly do the same with **prod** versions as well.
 
 <img class="code-marker" src="/assets/s.png" />In your terminal, run.
 
-``` bash
+```bash
 $ aws cognito-idp sign-up \
   --region YOUR_PROD_COGNITO_REGION \
   --client-id YOUR_PROD_COGNITO_APP_CLIENT_ID \
@@ -55,7 +55,7 @@ Here use your prod version of your Cognito details.
 
 <img class="code-marker" src="/assets/s.png" />And confirm the user.
 
-``` bash
+```bash
 $ aws cognito-idp admin-confirm-sign-up \
   --region YOUR_PROD_COGNITO_REGION \
   --user-pool-id YOUR_PROD_COGNITO_USER_POOL_ID \
@@ -70,7 +70,7 @@ Now we are ready to test our APIs.
 
 Let's test our dev endpoint. Run the following command:
 
-``` bash
+```bash
 $ npx aws-api-gateway-cli-test \
 --username='admin@example.com' \
 --password='Passw0rd!' \
@@ -85,22 +85,22 @@ $ npx aws-api-gateway-cli-test \
 --body='{"content":"hello world","attachment":"hello.jpg"}'
 ```
 
-Refer back to the [Deploying through Seed]({% link _chapters/deploying-through-seed.md %}) chapter for these:
+Refer back to the [Deploying through Github]({% link _chapters/deploying-through-github.md %}) chapter for these:
 
 - `YOUR_DEV_COGNITO_USER_POOL_ID` and `YOUR_DEV_COGNITO_APP_CLIENT_ID` are all related to your Cognito User Pool.
 - `YOUR_DEV_IDENTITY_POOL_ID` is for your Cognito Identity Pool.
-- And `YOUR_DEV_API_GATEWAY_URL` is your API Gateway endpoint. It looks something likes this `https://ly55wbovq4.execute-api.us-east-1.amazonaws.com/dev`. But if you have configured it with a custom domain use the one from the [Set custom domains through Seed]({% link _chapters/set-custom-domains-through-seed.md %}) chapter.
+- And `YOUR_DEV_API_GATEWAY_URL` is your API Gateway endpoint. It looks something likes this `https://ly55wbovq4.execute-api.us-east-1.amazonaws.com/dev`. But if you have configured it with a custom domain use the one from the [Set custom domains through Github]({% link _chapters/set-custom-domains-through-github.md %}) chapter.
 - Finally, the `YOUR_DEV_API_GATEWAY_REGION` and `YOUR_DEV_COGNITO_REGION` is the region you deployed to. In our case it is `us-east-1`.
 
 If the command is successful, it'll look something like this.
 
-``` bash
+```bash
 Authenticating with User Pool
 Getting temporary credentials
 Making API request
 { status: 200,
   statusText: 'OK',
-  data: 
+  data:
    { userId: 'us-east-1:9bdc031d-ee9e-4ffa-9a2d-123456789',
      noteId: '8f7da030-650b-11e7-a661-123456789',
      content: 'hello world',
@@ -110,7 +110,7 @@ Making API request
 
 Also run the same command for prod. Make sure to use the prod versions.
 
-``` bash
+```bash
 $ npx aws-api-gateway-cli-test \
 --username='admin@example.com' \
 --password='Passw0rd!' \

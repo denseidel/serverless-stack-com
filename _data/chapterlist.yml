@@ -189,7 +189,7 @@ build-react:
           url: /chapters/redirect-on-login.html
 
 deploy-backend-prod:
-  title: Deploying the backend to production 
+  title: Deploying the backend to production
   chapters:
     - page: Getting production ready
       url: /chapters/getting-production-ready.html
@@ -209,25 +209,25 @@ deploy-backend-prod:
     - page: Automating Serverless deployments
       url: /chapters/automating-serverless-deployments.html
       subchapters:
-        - page: Setting up your project on Seed
-          url: /chapters/setting-up-your-project-on-seed.html
-        - page: Configure secrets in Seed
-          url: /chapters/configure-secrets-in-seed.html
-        - page: Deploying through Seed
-          url: /chapters/deploying-through-seed.html
-        - page: Set custom domains through Seed
-          url: /chapters/set-custom-domains-through-seed.html
+        - page: Setting up your project on Github
+          url: /chapters/setting-up-your-project-on-github.html
+        - page: Configure secrets in Github
+          url: /chapters/configure-secrets-in-github.html
+        - page: Deploying through Github
+          url: /chapters/deploying-through-github.html
+        - page: Set custom domains through Github
+          url: /chapters/set-custom-domains-through-github.html
     - page: Test the configured APIs
       url: /chapters/test-the-configured-apis.html
-    - page: Monitoring deployments in Seed
-      url: /chapters/monitoring-deployments-in-seed.html
+    - page: Monitoring deployments in Github
+      url: /chapters/monitoring-deployments-in-github.html
 
 deploy-frontend-prod:
   title: Deploying the frontend to production
   chapters:
     - page: Automating React Deployments
       url: /chapters/automating-react-deployments.html
-      subchapters: 
+      subchapters:
         - page: Manage environments in Create React App
           url: /chapters/manage-environments-in-create-react-app.html
         - page: Create a build script
@@ -254,13 +254,13 @@ conclusion:
       url: /chapters/changelog.html
     - page: Staying up to date
       url: /chapters/staying-up-to-date.html
-      
+
 best-practices-intro:
   title: Introduction
   chapters:
     - page: Best practices for building Serverless apps
       url: /chapters/best-practices-for-building-serverless-apps.html
-      
+
 organize-serverless-apps:
   title: Organize a Serverless app
   chapters:
@@ -268,7 +268,7 @@ organize-serverless-apps:
       url: /chapters/organizing-serverless-projects.html
     - page: Cross-stack references in Serverless
       url: /chapters/cross-stack-references-in-serverless.html
-      subchapters: 
+      subchapters:
         - page: DynamoDB as a Serverless service
           url: /chapters/dynamodb-as-a-serverless-service.html
         - page: S3 as a Serverless service
@@ -295,7 +295,7 @@ configure-environments:
       url: /chapters/parameterize-serverless-resources-names.html
     - page: Deploying to multiple AWS accounts
       url: /chapters/deploying-to-multiple-aws-accounts.html
-      subchapters: 
+      subchapters:
         - page: Deploy the resources repo
           url: /chapters/deploy-the-resources-repo.html
         - page: Deploy the API services repo
@@ -308,6 +308,8 @@ configure-environments:
       url: /chapters/share-route-53-domains-across-aws-accounts.html
     - page: Monitor usage for environments
       url: /chapters/monitor-usage-for-environments.html
+    - page: Improve resource usage and cost
+      url: /chapters/improve-resource-usage-and-cost.html
 
 development-lifecycle:
   title: Development lifecycle

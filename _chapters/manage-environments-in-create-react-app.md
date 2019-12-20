@@ -12,7 +12,7 @@ Recall from our backend section that we created two environments (dev and prod) 
 
 Let's start by looking at how our app is configured currently. Our `src/config.js` stores the info for all of our backend resources.
 
-``` js
+```js
 export default {
   MAX_ATTACHMENT_SIZE: 5000000,
   STRIPE_KEY: "pk_test_1234567890",
@@ -33,21 +33,21 @@ export default {
 };
 ```
 
-We need to change this so that when we *push* our app to **dev** it connectes to the dev environment of our backend and for **prod** it connects to the prod environment. Of course you can add many more environments, but let's just stick to these for now.
+We need to change this so that when we _push_ our app to **dev** it connectes to the dev environment of our backend and for **prod** it connects to the prod environment. Of course you can add many more environments, but let's just stick to these for now.
 
 ### Environment Variables in Create React App
 
-Our React app is a static single page app. This means that once a *build* is created for a certain environment it persists for that environment.
+Our React app is a static single page app. This means that once a _build_ is created for a certain environment it persists for that environment.
 
 [Create React App](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#adding-custom-environment-variables) has support for custom environment variables baked into the build system. To set a custom environment variable, simply set it while starting the Create React App build process.
 
-``` bash
+```bash
 $ REACT_APP_TEST_VAR=123 npm start
 ```
 
 Here `REACT_APP_TEST_VAR` is the custom environment variable and we are setting it to the value `123`. In our app we can access this variable as `process.env.REACT_APP_TEST_VAR`. So the following line in our app:
 
-``` js
+```js
 console.log(process.env.REACT_APP_TEST_VAR);
 ```
 
@@ -61,7 +61,7 @@ For our purpose let's use an environment variable called `REACT_APP_STAGE`. This
 
 <img class="code-marker" src="/assets/s.png" />Replace `src/config.js` with this.
 
-``` js
+```js
 const dev = {
   STRIPE_KEY: "YOUR_STRIPE_DEV_PUBLIC_KEY",
   s3: {
@@ -99,9 +99,7 @@ const prod = {
 };
 
 // Default to dev if not set
-const config = process.env.REACT_APP_STAGE === 'prod'
-  ? prod
-  : dev;
+const config = process.env.REACT_APP_STAGE === "prod" ? prod : dev;
 
 export default {
   // Add common config values here
@@ -110,7 +108,7 @@ export default {
 };
 ```
 
-Make sure to replace the different version of the resources with the ones from the [Deploying through Seed]({% link _chapters/deploying-through-seed.md %}) chapter.
+Make sure to replace the different version of the resources with the ones from the [Deploying through Github]({% link _chapters/deploying-through-github.md %}) chapter.
 
 We did not complete our Stripe account setup back then, so we don't have the production version of this key. For now we'll just assume that we have two versions of the same key. So `YOUR_STRIPE_DEV_PUBLIC_KEY` and `YOUR_STRIPE_PROD_PUBLIC_KEY` are the same ones for now.
 
@@ -120,12 +118,13 @@ If we switch over to our app, we should see it in development mode and it'll be 
 
 We don't need to worry about the prod version just yet. But as an example, if we wanted to build the prod version of our app we'd have to run the following:
 
-``` bash
+```bash
 $ REACT_APP_STAGE=prod npm run build
 ```
 
 OR for Windows
-``` bash
+
+```bash
 set "REACT_APP_STAGE=prod" && npm start
 ```
 

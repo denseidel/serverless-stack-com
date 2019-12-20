@@ -8,6 +8,8 @@ ref: what-is-infrastructure-as-code
 comments_id: what-is-infrastructure-as-code/161
 ---
 
+TODO: https://theburningmonk.com/2019/03/making-terraform-and-serverless-framework-work-together/ seperate shared infrastructure like dbs and vpc from functions.
+
 [Serverless Framework](https://serverless.com) converts your `serverless.yml` into a [CloudFormation](https://aws.amazon.com/cloudformation) template. This is a description of the infrastructure that you are trying to configure as a part of your serverless project. In our case we were describing the Lambda functions and API Gateway endpoints that we were trying to configure.
 
 However, in earlier part of this guide we created our DynamoDB table, Cognito User Pool, S3 uploads bucket, and Cognito Identity Pool through the AWS Console. You might be wondering if this too can be configure programmatically, instead of doing them manually through the console. It definitely can!
@@ -22,28 +24,28 @@ Serverless Framework uses the `service` name to identify projects. Since we are 
 
 <img class="code-marker" src="/assets/s.png" />Open the `serverless.yml` and find the following line:
 
-``` yml
+```yml
 service: notes-app-api
 ```
 
 <img class="code-marker" src="/assets/s.png" />And replace it with this:
 
-``` yml
+```yml
 service: notes-app-2-api
 ```
 
 <img class="code-marker" src="/assets/s.png" />Also, find this line in the `serverless.yml`:
 
-``` yml
-  stage: prod
-``` 
+```yml
+stage: prod
+```
 
 <img class="code-marker" src="/assets/s.png" />And replace it with:
 
-``` yml
-  stage: dev
+```yml
+stage: dev
 ```
 
 We are defaulting the stage to `dev` instead of `prod`. This will become clear later when we create multiple environments.
 
-Let's start by configuring our DynamoDB in our `serverless.yml`. 
+Let's start by configuring our DynamoDB in our `serverless.yml`.
