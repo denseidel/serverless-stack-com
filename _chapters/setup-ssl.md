@@ -8,7 +8,33 @@ comments_id: comments-for-set-up-ssl/133
 ref: setup-ssl
 ---
 
-Now that our app is being served through our domain, let's add a layer of security to it by switching to HTTPS. AWS makes this fairly easy to do, thanks to Certificate Manager.
+Now that we have our CloudFront distribution live, let's set up our domain with it. You can purchase a domain right from the [AWS Console](https://console.aws.amazon.com) by heading to the Route 53 section in the list of services.
+
+![Select Route 53 service screenshot](/assets/select-route-53-service.png)
+
+### Purchase a Domain with Route 53
+
+Type in your domain in the **Register domain** section and click **Check**.
+
+![Search available domain screenshot](/assets/search-available-domain.png)
+
+After checking its availability, click **Add to cart**.
+
+![Add domain to cart screenshot](/assets/add-domain-to-cart.png)
+
+And hit **Continue** at the bottom of the page.
+
+![Continue to contact details screenshot](/assets/continue-to-contact-detials.png)
+
+Fill in your contact details and hit **Continue** once again.
+
+![Continue to confirm details screenshot](/assets/continue-to-confirm-detials.png)
+
+Finally, review your details and confirm the purchase by hitting **Complete Purchase**.
+
+![Confirm domain purchase screenshot](/assets/confirm-domain-purchase.png)
+
+Now that we have our domain, let's add a layer of security to it by switching to HTTPS. AWS makes this fairly easy to do, thanks to Certificate Manager. The SSL Certificate is [required](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/CNAMEs.html#alternate-domain-names-requirements) for configuring your domain as an alternative name on your CloudFront distribution.
 
 ### Request a Certificate
 
@@ -46,50 +72,19 @@ The process of creating a DNS record and validating it can take around 30 minute
 
 Next, we'll associate this certificate with our CloudFront Distributions.
 
-### Update CloudFront Distributions with Certificate
+You can do this step also with [cloudformation](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-certificatemanager-certificate.html) yet this requires you to manually validate the domain ownership. Alternatively you can implement a [custom resource](https://binx.io/blog/2018/10/05/automated-provisioning-of-acm-certificates-using-route53-in-cloudformation/). For the sake o bootstraping we will do this step manually and verify the domain through email for the first time. Add the following to your could formation Stack
 
-Open up our first CloudFront Distribution from our list of distributions and hit the **Edit** button.
 
-![Select CloudFront Distribution screenshot](/assets/select-cloudfront-Distribution.png)
+```yaml
+  DomainCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties: 
+      DomainName: "d10l.de"
+      SubjectAlternativeNames: ["www.d10l.de", "*.d10l.de"]
+      ValidationMethod: DNS
+```
 
-Now switch the **SSL Certificate** to **Custom SSL Certificate** and select the certificate we just created from the drop down. And scroll down to the bottom and hit **Yes, Edit**.
+After the stack has started check the log and create the DNS entry in Route53 to validate the domain.
 
-![Select custom SSL Certificate screenshot](/assets/select-custom-ssl-certificate.png)
+Next, we'll add an alternate domain name for our CloudFront Distribution.
 
-Next, head over to the **Behaviors** tab from the top.
-
-![Select Behaviors tab screenshot](/assets/select-behaviors-tab.png)
-
-And select the only one we have and hit **Edit**.
-
-![Edit Distribution Behavior screenshot](/assets/edit-distribution-behavior.png)
-
-Then switch the **Viewer Protocol Policy** to **Redirect HTTP to HTTPS**. And scroll down to the bottom and hit **Yes, Edit**.
-
-![Switch Viewer Protocol Policy screenshot](/assets/switch-viewer-protocol-policy.png)
-
-Now let's do the same for our other CloudFront Distribution.
-
-![Select custom SSL Certificate screenshot](/assets/select-custom-ssl-certificate-2.png)
-
-But leave the **Viewer Protocol Policy** as **HTTP and HTTPS**. This is because we want our users to go straight to the HTTPS version of our non-www domain. As opposed to redirecting to the HTTPS version of our www domain before redirecting again.
-
-![Dont switch Viewer Protocol Policy for www distribution screenshot](/assets/dont-switch-viewer-protocol-policy-for-www-distribution.png)
-
-### Update S3 Redirect Bucket
-
-The S3 Redirect Bucket that we created in the last chapter is redirecting to the HTTP version of our non-www domain. We should switch this to the HTTPS version to prevent the extra redirect.
-
-Open up the S3 Redirect Bucket we created in the last chapter. Head over to the **Properties** tab and select **Static website hosting**.
-
-![Open S3 Redirect Bucket Properties screenshot](/assets/open-s3-redirect-bucket-properties.png)
-
-Change the **Protocol** to **https** and hit **Save**.
-
-![Change S3 Redirect to HTTPS screenshot](/assets/change-s3-redirect-to-https.png)
-
-And that's it. Our app should be served out on our domain through HTTPS.
-
-![App live with certificate screenshot](/assets/app-live-with-certificate.png)
-
-Next up, let's look at the process of deploying updates to our app.

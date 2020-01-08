@@ -94,7 +94,7 @@ automating-serverless-deployments
 setting-up-your-project-on-seed
 configure-secrets-in-seed
 deploying-through-seed
-set-custom-domains-through-seed
+set-custom-domains
 test-the-configured-apis
 monitoring-deployments-in-seed
 automating-react-deployments

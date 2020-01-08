@@ -89,7 +89,7 @@ Refer back to the [Deploying through Github]({% link _chapters/deploying-through
 
 - `YOUR_DEV_COGNITO_USER_POOL_ID` and `YOUR_DEV_COGNITO_APP_CLIENT_ID` are all related to your Cognito User Pool.
 - `YOUR_DEV_IDENTITY_POOL_ID` is for your Cognito Identity Pool.
-- And `YOUR_DEV_API_GATEWAY_URL` is your API Gateway endpoint. It looks something likes this `https://ly55wbovq4.execute-api.us-east-1.amazonaws.com/dev`. But if you have configured it with a custom domain use the one from the [Set custom domains through Github]({% link _chapters/set-custom-domains-through-github.md %}) chapter.
+- And `YOUR_DEV_API_GATEWAY_URL` is your API Gateway endpoint. It looks something likes this `https://ly55wbovq4.execute-api.us-east-1.amazonaws.com/dev`. But if you have configured it with a custom domain use the one from the [Set custom domains through Github]({% link _chapters/set-custom-domains.md %}) chapter.
 - Finally, the `YOUR_DEV_API_GATEWAY_REGION` and `YOUR_DEV_COGNITO_REGION` is the region you deployed to. In our case it is `us-east-1`.
 
 If the command is successful, it'll look something like this.

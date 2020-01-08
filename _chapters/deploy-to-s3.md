@@ -37,3 +37,38 @@ And our app should be live on S3! If you head over to the URL assigned to you (i
 ![App live on S3 screenshot](/assets/app-live-on-s3.png)
 
 Next we'll configure CloudFront to serve our app out globally.
+
+
+To automate this create the following Github Pipeline in `.github/workflows/production.yml`:
+
+{% raw %}
+```yaml
+name: Production
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Build application
+        run: npm run build
+      - name: Deploy to s3
+        run: |
+          aws s3 sync build/ s3://ssk-notes-app-client-prod
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+```
+{% endraw %}

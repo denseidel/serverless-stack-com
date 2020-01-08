@@ -82,3 +82,54 @@ This panel also shows us where our app will be accessible. AWS assigns us a URL 
 ![Edit static website hosting properties screenshot](/assets/edit-static-web-hosting-properties.png)
 
 Now that our bucket is all set up and ready, let's go ahead and upload our assets to it.
+
+TODO: Infrastructure as Code Setup with cloudformation.
+
+Documentation for [s3 bucket](https://docs.aws.amazon.com/de_de/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket.html), [bucket policy](https://docs.aws.amazon.com/de_de/AWSCloudFormation/latest/UserGuide/aws-properties-s3-policy.html), [Ref](https://docs.aws.amazon.com/de_de/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-ref.html) and the [basics](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-whatis-concepts.html).
+
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 'Static website hosting with S3 and CloudFront'
+Parameters:
+  DefaultRootObject:
+    Description: 'The default path for the index document.'
+    Type: String
+    Default: 'index.html'
+  ErrorPagePath:
+    Description: 'The path of the error page for the website.'
+    Type: String
+    Default: 'index.html'
+  ApplicationName:
+    Description: 'The name of the application'
+    Type: String
+    Default: 'ssk-notes-app-client'
+Resources:
+  # Create the bucket to contain the website HTML
+  ProdLiveS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:  !Sub '${ApplicationName}-prod'
+      WebsiteConfiguration:
+        IndexDocument: !Ref DefaultRootObject
+        ErrorDocument: !Ref ErrorPagePath
+  ReadPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref ProdLiveS3Bucket
+      PolicyDocument:
+        Statement:
+        - Action: 's3:GetObject'
+          Effect: Allow
+          Resource: !Sub 'arn:aws:s3:::${ProdLiveS3Bucket}/*'
+          Principal: '*'
+Outputs:
+  BucketName:
+    Description: 'S3 Bucket Name'
+    Value: !Ref ProdLiveS3Bucket
+```
+
+Deploy it in the web CloudFormation UI or in the [cli](https://docs.aws.amazon.com/de_de/AWSCloudFormation/latest/UserGuide/using-cfn-cli-creating-stack.html):
+
+```bash
+aws cloudformation create-stack --stack-name myteststack --template-body file:///home/testuser/mytemplate.json --parameters ParameterKey=Parm1,ParameterValue=test1 ParameterKey=Parm2,ParameterValue=test2
+```

@@ -73,3 +73,101 @@ Pick **404** for the **HTTP Error Code** and select **Customize Error Response**
 And hit **Create**. This is basically telling CloudFront to respond to any 404 responses from our S3 bucket with the `index.html` and a 200 status code. Creating a custom error response should take a couple of minutes to complete.
 
 Next up, let's point our domain to our CloudFront Distribution.
+
+
+To set the distribution up automatically update the cloudformation template under `infrastructure/prod.yaml`:
+
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 'Static website hosting with S3 and CloudFront'
+Parameters:
+  DefaultRootObject:
+    Description: 'The default path for the index document.'
+    Type: String
+    Default: '/index.html'
+  ErrorPagePath:
+    Description: 'The path of the error page for the website.'
+    Type: String
+    Default: '/index.html'
+  ApplicationName:
+    Descriptoin: 'The name of the application'
+    Type: String
+    Default: 'ssk-notes-app-client'
+Resources:
+  # Create the bucket to contain the website HTML
+  ProdLiveS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:  !Sub '${ApplicationName}-prod'
+      WebsiteConfiguration:
+        IndexDocument: !Ref DefaultRootObject
+        ErrorDocument: !Ref ErrorPagePath
+  # Configure the bucket as a CloudFront Origin
+  ReadPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref ProdLiveS3Bucket
+      PolicyDocument:
+        Statement:
+        - Action: 's3:GetObject'
+          Effect: Allow
+          Resource: !Sub 'arn:aws:s3:::${ProdLiveS3Bucket}/*'
+          Principal:
+            CanonicalUser: !GetAtt CloudFrontOriginAccessIdentity.S3CanonicalUserId
+  CloudFrontOriginAccessIdentity:
+    Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Ref ProdLiveS3Bucket
+  CloudFrontDistribution:
+    Type: 'AWS::CloudFront::Distribution'
+    Properties:
+      DistributionConfig:
+        CustomErrorResponses:
+        - ErrorCode: 404 # not found
+          ResponseCode: 200
+          ErrorCachingMinTTL: 300
+          ResponsePagePath: !Ref ErrorPagePath
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          - OPTIONS
+          CachedMethods:
+          - GET
+          - HEAD
+          - OPTIONS
+          Compress: true
+          DefaultTTL: 3600 # in seconds
+          ForwardedValues:
+            Cookies:
+              Forward: none
+            QueryString: false
+          MaxTTL: 86400 # in seconds
+          MinTTL: 60 # in seconds
+          TargetOriginId: s3origin
+          ViewerProtocolPolicy: 'allow-all'
+        DefaultRootObject: !Ref DefaultRootObject
+        Enabled: true
+        HttpVersion: http2
+        Origins:
+        - DomainName: !GetAtt 'ProdLiveS3Bucket.DomainName'
+          Id: s3origin
+          S3OriginConfig:
+            OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+        PriceClass: 'PriceClass_All'
+Outputs:
+  BucketName:
+    Description: 'S3 Bucket Name'
+    Value: !Ref ProdLiveS3Bucket
+  DistributionId:
+    Description: 'CloudFront Distribution ID'
+    Value: !Ref CloudFrontDistribution
+  Domain:
+    Description: 'Cloudfront Domain'
+    Value: !GetAtt CloudFrontDistribution.DomainName
+```
+
+
+Background Info [CloudFront Distribution in Cloudformation](https://docs.aws.amazon.com/de_de/AWSCloudFormation/latest/UserGuide/aws-resource-cloudfront-distribution.html): [full example](https://forestry.io/blog/automate-your-static-hosting-environment-with-aws-cloudformation/), [CloudFront Distribution Custom Error Response](https://docs.aws.amazon.com/de_de/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distribution-customerrorresponse.html).
+

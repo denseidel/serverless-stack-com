@@ -216,7 +216,7 @@ deploy-backend-prod:
         - page: Deploying through Github
           url: /chapters/deploying-through-github.html
         - page: Set custom domains through Github
-          url: /chapters/set-custom-domains-through-github.html
+          url: /chapters/set-custom-domains.html
     - page: Test the configured APIs
       url: /chapters/test-the-configured-apis.html
     - page: Monitoring deployments in Github
@@ -225,6 +225,23 @@ deploy-backend-prod:
 deploy-frontend-prod:
   title: Deploying the frontend to production
   chapters:
+    - page: Deploying a React app to AWS
+      url: /chapters/deploying-a-react-app-to-aws.html
+      subchapters:
+        - page: Create an S3 bucket
+          url: /chapters/create-an-s3-bucket.html
+        - page: Deploy to S3
+          url: /chapters/deploy-to-s3.html
+        - page: Create a CloudFront distribution
+          url: /chapters/create-a-cloudfront-distribution.html
+        - page: Set up www domain redirect
+          url: /chapters/setup-www-domain-redirect.html
+        - page: Set up SSL
+          url: /chapters/setup-ssl.html
+        - page: Set up your domain with CloudFront
+          url: /chapters/setup-your-domain-with-cloudfront.html
+        - page: Deploy updates
+          url: /chapters/deploy-updates.html
     - page: Automating React Deployments
       url: /chapters/automating-react-deployments.html
       subchapters:
@@ -378,23 +395,6 @@ extra-frontend:
       url: /chapters/code-splitting-in-create-react-app.html
     - page: Environments in Create React App
       url: /chapters/environments-in-create-react-app.html
-    - page: Deploying a React app to AWS
-      url: /chapters/deploying-a-react-app-to-aws.html
-      subchapters:
-        - page: Create an S3 bucket
-          url: /chapters/create-an-s3-bucket.html
-        - page: Deploy to S3
-          url: /chapters/deploy-to-s3.html
-        - page: Create a CloudFront distribution
-          url: /chapters/create-a-cloudfront-distribution.html
-        - page: Set up your domain with CloudFront
-          url: /chapters/setup-your-domain-with-cloudfront.html
-        - page: Set up www domain redirect
-          url: /chapters/setup-www-domain-redirect.html
-        - page: Set up SSL
-          url: /chapters/setup-ssl.html
-        - page: Deploy updates
-          url: /chapters/deploy-updates.html
     - page: Manage User Accounts in AWS Amplify
       url: /chapters/manage-user-accounts-in-aws-amplify.html
       subchapters:

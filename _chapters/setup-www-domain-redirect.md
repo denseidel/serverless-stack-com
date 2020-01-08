@@ -36,6 +36,20 @@ Also, make sure to copy the **Endpoint** as we'll be needing this later.
 
 And hit **Save** to make the changes. Next we'll create a CloudFront Distribution to point to this S3 redirect Bucket.
 
+CloudFormation Resources:
+
+```yaml
+Resources:  
+  # Create the bucket redirect www traffic 
+  ProdLiveS3BucketWWWRedirect:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:  !Sub 'www-${ApplicationName}-prod'
+      WebsiteConfiguration:
+        RedirectAllRequestsTo:
+          HostName: !Ref DomainName
+```
+
 ### Create a CloudFront Distribution
 
 Create **a new CloudFront Distribution**. And copy the S3 **Endpoint** from the step above as the **Origin Domain Name**. Make sure to **not** use the one from the dropdown. In my case, it is `http://www-notes-app-client.s3-website-us-east-1.amazonaws.com`.
@@ -52,6 +66,34 @@ And hit **Create Distribution**.
 
 Finally, we'll point our www domain to this CloudFront Distribution.
 
+```yaml
+CloudFrontOriginAccessIdentity:
+    Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Ref ProdLiveS3Bucket
+ProdWWWCloudFrontDistribution:
+    Type: 'AWS::CloudFront::Distribution'
+    Properties:
+      DistributionConfig:
+        Aliases:
+        - !Sub 'www.${DomainName}'
+        Enabled: true
+        HttpVersion: http2
+        IPV6Enabled: true
+        Origins:
+        - DomainName: !GetAtt 'ProdLiveS3BucketWWWRedirect.DomainName'
+          Id: www-s3origin
+          S3OriginConfig:
+            OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}'
+        PriceClass: 'PriceClass_All'
+        ViewerCertificate:
+          AcmCertificateArn: !Ref DomainCertificate
+          MinimumProtocolVersion: 'TLSv1.1_2016'
+          SslSupportMethod: 'sni-only'
+```
+
+
 ### Point WWW Domain to CloudFront Distribution
 
 Head over to your domain in Route 53 and hit **Create Record Set**.
@@ -61,6 +103,19 @@ Head over to your domain in Route 53 and hit **Create Record Set**.
 This time fill in `www` as the **Name** and select **Alias** as **Yes**. And pick your new CloudFront Distribution from the **Alias Target** dropdown.
 
 ![Fill in record set detials screenshot](/assets/fill-in-record-set-details.png)
+
+```yaml
+  ARecordSetWWW:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Name: !Sub 'www.${DomainName}'
+      AliasTarget: 
+        DNSName: !GetAtt 'ProdWWWCloudFrontDistribution.DomainName'
+        HostedZoneId: 'Z2FDTNDATAQYW2'
+      HostedZoneName: !Join ["", [!Ref DomainName, "."]]
+      Type: A
+      TTL: 60
+```
 
 ### Add IPv6 Support
 
@@ -73,3 +128,16 @@ Create a new Record Set with the exact same settings as before, except make sure
 And that's it! Just give it some time for the DNS to propagate and if you visit your www version of your domain, it should redirect you to your non-www version.
 
 Next, we'll set up SSL and add HTTPS support for our domains.
+
+```yaml
+  AAAARecordSetWWW:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Name: !Sub 'www.${DomainName}'
+      AliasTarget: 
+        DNSName: !GetAtt 'ProdWWWCloudFrontDistribution.DomainName'
+        HostedZoneId: 'Z2FDTNDATAQYW2'
+      HostedZoneName: !Join ["", [!Ref DomainName, "."]]
+      Type: AAAA
+      TTL: 60
+```
